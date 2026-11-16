@@ -16,20 +16,20 @@ You produce **findings** and nothing else. Fixing them is `resolve-review`'s job
 
 ## Inputs
 
-Nothing here is inferred but the child. The output is the one positional and the one required input; a run
+Nothing here is inferred but the child, and that by a fixed probe. The output is the one positional and the one required input; a run
 without it stops rather than guessing.
 
 | Input | Values | Default | Meaning |
 | --- | --- | --- | --- |
 | `output` *(positional)* | `pr` · `md` | **required** | where the findings are published |
-| `--child <name>` | a child in home's `children.txt` | the active child | the repository under review ([The child](#the-child)) |
+| `--child <name>` | a child in home's `children.txt` | deduced | the repository under review ([The child](#the-child)) |
 | `--round` | `first` · `follow-up` | `first` | `follow-up` is arbitration (step 3), never a fresh pass |
 | `--scope` | `branch` · `uncommitted` | `branch` | what to diff. `md` only |
 | `--as <tag>` | short slug (`cursor`, `codex`) | none | namespaces the findings, for concurrent reviewers |
 | `--ticket <NN>` | ticket number | inferred | `--scope uncommitted` only |
 
 ```
-/review-changes pr                              round 1 on the PR of the active child's current branch
+/review-changes pr                              round 1 on the PR of the deduced child's current branch
 /review-changes pr --child frontend             the same, with the child named
 /review-changes pr --round follow-up            arbitrate the rulings on that PR
 /review-changes md --scope uncommitted          the ticket in flight, before it is committed
@@ -49,8 +49,14 @@ or at a task worktree's root, and the child is the directory `<child>/` inside i
 the child as an input, where other shared skills rely on the active child alone, because they launch other
 processes (a reviewer CLI, subagents) and every one of them has to land in the same repository.
 
-- **The default is the active child**, as home's `.agents/AGENTS.md` defines it. When that does not settle
-  on one child, ask. A headless run has nobody to ask and stops.
+- **Without `--child`, the child is deduced**, and the first probe that names one child wins:
+  1. A PR or comment url among the inputs → the child whose repository in home's `children.txt` is the
+     url's `owner/repo`. A url of any other repository stops the run.
+  2. One child directory present at the session's root, as a task worktree made for one child has → that
+     child. Home's `scripts/children.sh` prints the names to look for.
+  3. The active child, as home's `.agents/AGENTS.md` infers it from the request.
+
+  When none of them settles on one child, ask. A headless run has nobody to ask and stops.
 - **Every `git`, `gh` and `pnpm` command in this skill and its supporting files runs in the child's
   directory.** Run at the home root, the same command reads home's branch, home's tree and home's pull
   request.

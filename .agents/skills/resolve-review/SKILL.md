@@ -27,13 +27,13 @@ replied to.
 | --- | --- | --- | --- |
 | `output` *(positional)* | `pr` · `md` | **required** | where the findings live |
 | `target` *(positional)* | PR url, comment url, or review-file path | the PR of the child's current branch / its review file | scopes the run |
-| `--child <name>` | a child in home's `children.txt` | the active child | the repository the findings are about |
+| `--child <name>` | a child in home's `children.txt` | deduced | the repository the findings are about |
 | `--auto` | flag | off | autonomous gating: no Gate 1, no Gate 2, the run commits and pushes (or leaves the push to a caller that says it pushes); the only stop is `needs-human`. `pr` only |
 | `--scope` | `branch` · `uncommitted` | `branch` | which review file: the task's, or the in-flight ticket's. `md` only |
 | `--ticket <NN>` | ticket number | inferred | `--scope uncommitted` only |
 
 ```
-/resolve-review pr                      every open finding on the PR of the active child's current branch
+/resolve-review pr                      every open finding on the PR of the deduced child's current branch
 /resolve-review pr --child frontend     the same, with the child named
 /resolve-review pr --auto               the same, unattended — one round of the review loop
 /resolve-review pr <comment url>        that single comment, scoping the whole run to it
@@ -45,7 +45,7 @@ replied to.
 Contradictory inputs stop the run: `--scope` or `--ticket` with `pr`, `--ticket` with `--scope branch`, or
 `--auto` with `md`.
 
-`--child` is `review-changes`' own, with the same default and the same rules
+`--child` is `review-changes`' own, deduced the same way when absent and bound by the same rules
 ([`../review-changes/SKILL.md`](../review-changes/SKILL.md#the-child)): the findings are gathered, the code
 fixed, the checks run and the commit made in that child, never in the home worktree around it.
 

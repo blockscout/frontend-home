@@ -25,20 +25,20 @@ also runs by hand on any open PR; `create-pr` never offers it.
 | Input | Values | Default | Meaning |
 | --- | --- | --- | --- |
 | `target` *(positional)* | PR url | the open PR of the child's current branch | the PR under review |
-| `--child <name>` | a child in home's `children.txt` | the active child | the repository the PR belongs to |
+| `--child <name>` | a child in home's `children.txt` | deduced | the repository the PR belongs to |
 | `--reviewer <name>` | a file in [`reviewers/`](reviewers/) | `cursor` | which reviewer runs the rounds |
 | `--model <id>` | a model id the reviewer's CLI accepts | the reviewer's default | model override, passed through |
 
 ```
-/review-loop                                     the PR of the active child's current branch, reviewed by cursor
+/review-loop                                     the PR of the deduced child's current branch, reviewed by cursor
 /review-loop --child frontend                    the same, with the child named
-/review-loop https://github.com/o/r/pull/12      that PR
+/review-loop https://github.com/o/r/pull/12      that PR, in the child whose repository is o/r
 /review-loop --model gpt-5                       cursor, on the named model
 ```
 
 **The child is settled once, here, and handed to everything the loop launches.** The loop runs from home
 and the PR is a child's: [`../review-changes/SKILL.md`](../review-changes/SKILL.md#the-child) has the
-default and the rules, and they bind this file and [`ci-fixes.md`](ci-fixes.md) the same way. "The tree"
+probe that deduces it and the rules, and they bind this file and [`ci-fixes.md`](ci-fixes.md) the same way. "The tree"
 below is the child's tree, and every `git` and `gh` command runs in the child's directory. The reviewer and
 the resolver each get `--child <name>`, never a default of their own to work out.
 
