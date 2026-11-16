@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint:tsc": "tsc -p tsconfig.json",
-    "lint:doc-links": "./tools/doc-links/run.sh",
+    "lint:doc-links": "./scripts/doc-links.sh",
     "lint:children": "./scripts/check-children.sh",
     "test": "vitest run --dir tools"
   },

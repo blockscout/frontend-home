@@ -90,4 +90,4 @@ A directory earns a `CONTEXT.md` when getting oriented in it takes real reading 
 speak for itself. Offer it; do not write one unasked.
 
 A new `CONTEXT.md` needs a line in the per-directory list in `.agents/AGENTS.md`. Cross-references are
-checked by `pnpm lint:doc-links`.
+checked by the `lint:doc-links` script.

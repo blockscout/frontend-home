@@ -19,4 +19,9 @@ jobs:
       - run: npm ci
       - run: npm run lint:tsc
       - run: npm test
+      # The shared skills and rules name the children's files, so doc-links checks them in the children.
+      - name: Clone the children
+        run: |
+          git config --global url."https://github.com/".insteadOf git@github.com:
+          ./scripts/bootstrap.sh --depth 1
       - run: npm run lint:doc-links

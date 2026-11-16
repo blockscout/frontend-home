@@ -4,14 +4,6 @@
 markdown links, heading anchors, and the file and directory paths written in backticks. A consumer wires it
 to a package script (`pnpm lint:doc-links`) and a CI check.
 
-It runs from a devkit submodule: the repository checked is the working directory's, the TypeScript compiler
-is that repository's `node_modules/.bin/tsc`, and its settings come from an optional `devkit.config.json`
-at that repository's root:
-
-```json
-{ "docLinks": { "exclude": [ "src/toolkit/package" ] } }
-```
-
 ## Files
 
 | File | Role |
@@ -31,7 +23,7 @@ at that repository's root:
   Teaching the checker a new mark without amending that string leaves authors reading a footer that
   contradicts the tool.
 - **The repo root comes from git, asked from the working directory.** Asked from the entry file's own
-  location it answers with the devkit checkout, since a submodule is a repository of its own.
+  location, it answers with the tool's own checkout rather than the repository that runs it.
 - **`tsconfig.json` extends nothing.** It is compiled by each consumer's compiler, across TypeScript
   versions, so it cannot lean on a root config that only one of them has.
 - **Every path this directory's own docs write is checked by the tool they document.** A rename here that
@@ -45,10 +37,10 @@ at that repository's root:
 - **A false positive is more expensive than a miss.** Noise trains everyone to stop reading the output, so a
   path that names a shape rather than a location (`types/api.ts`, `hooks/`) is deliberately not reported —
   the judgements in `resolve.ts` exist to keep it that way.
-- **Skills and rules linked in from the devkit are checked in the consumer.** The walk follows the
-  symlinks, a relative link resolves from the file's real location inside the devkit, and a repository
-  path such as `.agents/GLOSSARY.md` resolves from the consumer's root — so a shared skill naming a file
-  the consumer lacks fails that consumer's run.
+- **Home's run needs every child cloned.** Shared skills and rules name a child's file by its path from the
+  child's root, so `scripts/doc-links.sh` passes each child as `--child`, and a root-relative path may
+  resolve in any of them. CI clones the children before the step. A child missing from the checkout stops
+  the run.
 - **`.cursor/rules/*.mdc` and `.claude/CLAUDE.md` are symlinks onto files under `.agents`.** Both the
   de-duplication and the realpath-relative resolution depend on that; drop either and every finding in a
   symlinked file is reported twice, or its relative links resolve from the wrong directory.

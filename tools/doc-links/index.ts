@@ -1,9 +1,13 @@
 /* eslint-disable no-console -- CLI tool, console output is the interface */
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { parseArgs } from 'node:util';
 
 import { checkFile } from './check';
 import { loadConfig } from './config';
 import { renderReport } from './report';
+import type { Child } from './resolve';
 import { buildRepoIndex } from './resolve';
 import { collectSurface } from './surface';
 
@@ -24,9 +28,22 @@ function trackedFiles(root: string): Array<string> {
   return execFileSync('git', [ 'ls-files' ], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
 }
 
+// `--child <dir>`, once per child cloned inside the repository: home passes each of its children. A missing
+// child would turn every path into it into a finding, so it stops the run instead.
+function children(root: string): Array<Child> {
+  const { values } = parseArgs({ options: { child: { type: 'string', multiple: true } } });
+  return (values.child ?? []).map((dir) => {
+    const childRoot = path.resolve(root, dir);
+    if (!existsSync(path.join(childRoot, '.git'))) {
+      throw new Error(`--child ${ dir }: no clone at ${ childRoot }. Clone the children first (scripts/bootstrap.sh).`);
+    }
+    return { root: childRoot, tracked: trackedFiles(childRoot) };
+  });
+}
+
 async function main(): Promise<void> {
   const root = repoRoot();
-  const repo = buildRepoIndex(root, trackedFiles(root));
+  const repo = buildRepoIndex(root, trackedFiles(root), children(root));
   const files = await collectSurface(root, repo.tracked, loadConfig(root).exclude);
 
   const findings = [];

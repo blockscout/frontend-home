@@ -29,4 +29,5 @@ A shared skill or rule is read while working in a child, the active child that `
 
 - Refer to another shared file by relative path (`./adr.md`).
 - Refer to a file the child owns by its path from the child's root (`.agents/GLOSSARY.md`). It resolves in
-  the active child.
+  the active child, and `npm run lint:doc-links` looks for it in every child.
+- Name a file in home itself as home's (home's `children.txt`).

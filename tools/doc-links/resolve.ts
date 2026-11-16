@@ -2,20 +2,33 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+// A repository cloned inside the one being checked: one of home's children.
+export interface Child {
+  readonly root: string;
+  readonly tracked: ReadonlyArray<string>;
+}
+
 export interface RepoIndex {
   readonly root: string;
   readonly tracked: ReadonlyArray<string>;
   // Derived rather than listed, so a new top-level directory needs no edit here. A path is only expected to
   // resolve when its first segment is one of these: `types/api.ts` names a kind of file, `src/api/types.ts`
-  // a location.
+  // a location. A child's directories count too, so a broken path into a child is still reported.
   readonly topLevel: ReadonlySet<string>;
+  // A shared skill or rule in home names a child's file by its path from the child's root, so a
+  // root-relative path may resolve in a child as well.
+  readonly childRoots: ReadonlyArray<string>;
 }
 
-export function buildRepoIndex(root: string, tracked: ReadonlyArray<string>): RepoIndex {
+const topLevelOf = (tracked: ReadonlyArray<string>): Array<string> =>
+  tracked.filter((file) => file.includes('/')).map((file) => file.split('/')[0]);
+
+export function buildRepoIndex(root: string, tracked: ReadonlyArray<string>, children: ReadonlyArray<Child> = []): RepoIndex {
   return {
     root,
     tracked,
-    topLevel: new Set(tracked.filter((file) => file.includes('/')).map((file) => file.split('/')[0])),
+    topLevel: new Set([ tracked, ...children.map((child) => child.tracked) ].flatMap(topLevelOf)),
+    childRoots: children.map((child) => child.root),
   };
 }
 
@@ -25,7 +38,9 @@ export const isPlaceholder = (target: string): boolean => /[<>{}*]|__/.test(targ
 // resolves its relative links from where the file really lives.
 export function resolves(repo: RepoIndex, realDir: string, target: string): string | undefined {
   const clean = target.replace(/^\.\//, '');
-  return [ path.resolve(realDir, clean), path.resolve(repo.root, clean) ].find((candidate) => existsSync(candidate));
+  return [ realDir, repo.root, ...repo.childRoots ]
+    .map((base) => path.resolve(base, clean))
+    .find((candidate) => existsSync(candidate));
 }
 
 // A path that resolves nowhere may still name a real file written short — `toolkit/theme/theme.ts` for

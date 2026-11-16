@@ -5,17 +5,10 @@ description: Add a new term, update an existing definition, or remove an outdate
 
 # Update the project glossary
 
-`.agents/GLOSSARY.md` is the **ubiquitous-language** reference for the project.
-It exists to disambiguate easily-confused terms and explain non-obvious names.
-It is **not** a feature index, a config reference, or a folder map — those live
-in code and in the project's own docs and rules.
-
-**The project must have the file.** If `.agents/GLOSSARY.md` does not exist,
-stop and tell the user the project has no glossary yet; create one only when
-they ask, with the intro paragraph and table columns described below.
-
-The terms used as examples below come from one project, the Blockscout explorer
-frontend. They show the shape of a good row; they are not terms to look for.
+`.agents/GLOSSARY.md` is the **ubiquitous-language** reference for the Blockscout
+frontend. It exists to disambiguate easily-confused terms and explain
+non-obvious names. It is **not** a feature index, a config reference, or a
+folder map — those live in code, `docs/ENVS.md`, and `.agents/rules/`.
 
 This skill ensures any glossary edit follows the same principles the file was
 designed around.
@@ -52,7 +45,7 @@ recoverable from code or other docs:
 
 - **Folder paths** (`src/features/<name>/`, `client/...`, etc.). Path follows
   predictably from the term's kebab-case feature name.
-- **Env var names** (`NEXT_PUBLIC_X_ENABLED`). These live in the project's env docs.
+- **Env var names** (`NEXT_PUBLIC_X_ENABLED`). These live in `docs/ENVS.md`.
 - **UI-location restatements** ("Displayed in the rollup navigation",
   "Exposed as a section under Tokens", "Surfaces as a button in the top bar").
   Trivially recoverable from the rendered app or a grep.
@@ -106,16 +99,16 @@ edit).
 ### 1. Confirm the term and its meaning
 
 Search the codebase to confirm what the term actually refers to. Read the
-relevant folder's config module, the page components, or the types file. Do
+relevant folder's `config.ts`, the page components, or the types file. Do
 not guess from the name alone — codename / product-name mismatches happen
 (e.g. `connectWallet` config key for the "Connect Wallet" feature, formerly
 `blockchain-interaction`).
 
 Reuse the existing exploration tools:
 
-- List the project's feature folders to confirm folder names.
+- `ls src/features/` to confirm folder names.
 - `grep -r "<term>"` to find usages.
-- Read the feature's config module for the canonical title and any
+- Read the feature's `config.ts` for the canonical title and any
   rename history.
 
 ### 2. Check if it's already in the glossary

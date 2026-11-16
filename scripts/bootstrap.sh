@@ -2,6 +2,7 @@
 
 # Clones every child listed in children.txt that is missing from this home clone.
 # A child already present is left as it is, so a second run changes nothing.
+# Arguments go to `git clone`: CI passes `--depth 1`.
 
 set -eu
 
@@ -17,6 +18,6 @@ printf '%s\n' "$children" | while read -r name url; do
     exit 1
   else
     echo "$name: cloning $url"
-    git clone "$url" "$dest"
+    git clone "$@" "$url" "$dest"
   fi
 done

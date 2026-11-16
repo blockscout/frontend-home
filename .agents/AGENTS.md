@@ -15,6 +15,9 @@ A root-relative path in a skill, a rule or a request names a file in the active 
 path resolves to `<child>/.agents/GLOSSARY.md`. A path meant for home itself says so. Run `git`, `gh` and
 package-manager commands from the active child's directory.
 
+Work on home's own files has no active child. There a rule's paths, such as where a new record or
+`CONTEXT.md` is listed, name home's files, and commands run at the home root.
+
 The active child sets the default, not a boundary. When a skill names another child or a folder outside
 home, as `resolve-config-request` does with the `frontend-configs` checkout, use it as named.
 
