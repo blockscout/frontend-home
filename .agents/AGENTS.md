@@ -31,6 +31,13 @@ commit it there, not in home.
 
 - `tools/doc-links/` — the doc-link checker.
 
+## Architecture decision records (ADRs)
+
+See `./rules/adr.md` when proposing or adding a new record.
+
+- `adr/0001-home-repo-over-submodule.md` — why the shared agent setup is a home repo and not a submodule in
+  each consumer, and the costs accepted for phase 1.
+
 ## Editing this instruction set
 
 Before changing anything under `.agents/`, read `./README.md`. It owns the provider symlinks and the rules

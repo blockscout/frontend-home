@@ -16,6 +16,44 @@ gitignored.
 | `scripts/` | Cloning the children, the check that the ignore files list them, and the links to their skills |
 | `tools/` | Developer tools a child installs from home as a pinned git dependency ([`tools/doc-links/CONTEXT.md`](tools/doc-links/CONTEXT.md)) |
 
+## Setup
+
+For a machine with nothing. Needed first: `git` with SSH access to GitHub, Node as in `.nvmrc`, pnpm
+(`corepack enable` takes the version from `package.json`), `jq`, an authenticated `gh`, and Claude Code.
+The hooks call `jq`, and cleanup asks `gh` whether a branch has landed.
+
+```bash
+git clone git@github.com:blockscout/frontend-home.git
+cd frontend-home
+./scripts/bootstrap.sh         # clones every child in children.txt, beside this README
+pnpm install                   # home's own tools
+pnpm -C frontend install       # the main clone's child; a task worktree installs its own
+pnpm lint:children && pnpm lint:skill-links   # the layout is whole
+claude                         # sessions start here, at the home root
+```
+
+- **Use a fresh directory**, with a fresh clone of each child inside it. A child clone that already exists
+  elsewhere, with its own worktrees, stays where it is and is not moved in.
+- **A child's local files** (`frontend/.env.local` and whatever else its `.worktreeinclude` lists) are
+  created once in the main clone's child. Every task worktree gets a copy from there.
+- **The first session asks to approve the `playwright` MCP server** from `.mcp.json`.
+- **The children's skills are already there**: the links in `.agents/skills/` are committed and resolve
+  once the child is cloned ([Children](#children)). A child's own instructions and rules load when a file
+  inside it is read.
+
+The hooks in `.claude/settings.json` then do the rest:
+
+| When | What happens |
+|---|---|
+| Session start | Every child is fetched; proven task worktrees idle for three days are removed and the others reported ([Cleanup](#cleanup)) |
+| A worktree is asked for (`--worktree`, mid-session, an isolated subagent) | A [task worktree](#task-worktrees) is made or reopened |
+| First command in a task worktree that needs dependencies | They are installed in the home worktree and in each child inside it |
+| A worktree-isolated subagent starts | It is told to read the child's always-loaded instructions |
+| A worktree is removed at exit or left mid-session | The whole task worktree is retired, when proven |
+
+Phase 1 runs with a log of every miss: a missing skill, a command run in the wrong directory, a stale
+worktree. It is kept in [`phase-1-log.md`](phase-1-log.md).
+
 ## Children
 
 `scripts/bootstrap.sh` clones every child in `children.txt` that is missing, beside this README. A child
