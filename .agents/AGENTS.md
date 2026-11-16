@@ -24,6 +24,9 @@ home, as `resolve-config-request` does with the `frontend-configs` checkout, use
 Before the first change in a child, read a file inside it. That loads the child's own instructions, and its
 rules load for the files they match.
 
+A skill that is a symlink in `.agents/skills/` belongs to the child it points into. Edit it in that child and
+commit it there, not in home.
+
 ## Per-directory context
 
 - `tools/doc-links/` — the doc-link checker.

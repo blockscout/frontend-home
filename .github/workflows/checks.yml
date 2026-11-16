@@ -23,8 +23,10 @@ jobs:
       - run: pnpm lint:tsc
       - run: pnpm test
       # The shared skills and rules name the children's files, so doc-links checks them in the children.
+      # The skill links are compared with the skills each child has on its main branch.
       - name: Clone the children
         run: |
           git config --global url."https://github.com/".insteadOf git@github.com:
           ./scripts/bootstrap.sh --depth 1
       - run: pnpm lint:doc-links
+      - run: pnpm lint:skill-links

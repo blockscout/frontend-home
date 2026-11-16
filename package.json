@@ -10,6 +10,7 @@
     "lint:tsc": "tsc -p tsconfig.json",
     "lint:doc-links": "./scripts/doc-links.sh",
     "lint:children": "./scripts/check-children.sh",
+    "lint:skill-links": "./scripts/skill-links.sh --check",
     "test": "vitest run --dir tools"
   },
   "devDependencies": {

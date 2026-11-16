@@ -11,7 +11,7 @@ gitignored.
 |---|---|
 | `.agents/` | Agent instructions, skills and rules, reached by Claude Code and Cursor through symlinks ([`.agents/README.md`](.agents/README.md)) |
 | `children.txt` | The children, by name and repository URL |
-| `scripts/` | Cloning the children, and the check that the ignore files list them |
+| `scripts/` | Cloning the children, the check that the ignore files list them, and the links to their skills |
 | `tools/` | Developer tools run in a child |
 
 ## Children
@@ -22,6 +22,10 @@ already present is left as it is.
 Each child is listed in two ignore files: `.gitignore` keeps it out of home's history, and `.ignore` lets a
 search from the home root reach it. `pnpm lint:children` fails when either file disagrees with
 `children.txt`.
+
+A child's skills reach a home session through committed symlinks in `.agents/skills/`.
+`scripts/skill-links.sh` writes them and `pnpm lint:skill-links` checks them
+([`.agents/README.md`](.agents/README.md#child-skills)).
 
 ## Writing a shared file
 
