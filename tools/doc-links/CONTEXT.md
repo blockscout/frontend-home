@@ -10,7 +10,7 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
 | File | Role |
 |---|---|
 | `surface.ts` | Which files are checked: the walked config roots (symlinks followed), the exclusions, and every markdown file in and below a directory that carries a `CONTEXT.md`, taken from the tracked-file list. Widening the check surface happens here. |
-| `config.ts` | Reads the consumer's `devkit.config.json`. |
+| `config.ts` | Reads the consumer's optional `doc-links.config.json`, at its repository root. |
 | `strip.ts` | Blanks the regions of a line that are not references — fenced blocks, and the illustration marks. |
 | `resolve.ts` | Turns a written reference into the file it names, and judges when a path that resolves nowhere is a break (shorthand, neighbour, top-level segment) rather than prose that looks like one. |
 | `check.ts` | One file in, its findings out. The two reference forms — backtick path, markdown link — are checked here. |

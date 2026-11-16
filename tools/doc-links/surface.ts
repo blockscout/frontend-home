@@ -9,7 +9,7 @@ import path from 'node:path';
 
 const ROOTS: ReadonlyArray<string> = [ '.agents', '.claude', '.cursor' ];
 
-// Excluded in every repository; a repository adds its own through `docLinks.exclude` in `devkit.config.json`.
+// Excluded in every repository; a repository adds its own through `exclude` in `doc-links.config.json`.
 const EXCLUDED: ReadonlyArray<string> = [ '.agents/tasks', '.claude/worktrees' ];
 
 const SKIPPED_DIRS = new Set([ 'node_modules', '.git', '.next' ]);
