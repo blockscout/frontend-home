@@ -11,6 +11,7 @@ gitignored.
 |---|---|
 | `.agents/` | Agent instructions, skills and rules, reached by Claude Code and Cursor through symlinks ([`.agents/README.md`](.agents/README.md)) |
 | `.claude/settings.json`, `.claude/hooks/` | Claude Code project settings and the hooks behind [task worktrees](#task-worktrees) |
+| `.claude/agents/` | Claude Code subagent definitions, which only Claude Code reads |
 | `children.txt` | The children, by name and repository URL |
 | `scripts/` | Cloning the children, the check that the ignore files list them, and the links to their skills |
 | `tools/` | Developer tools run in a child |
