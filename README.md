@@ -51,9 +51,26 @@ subagent's generated name has no child prefix, so it gets the children of its pa
   home branch.
 - **The hooks find home from their own location**, never from `CLAUDE_PROJECT_DIR` or the working
   directory, and clear inherited git variables before calling git in another repository.
-  `pnpm test:hooks` runs the creation hook against scratch repositories.
+  `pnpm test:hooks` runs the creation and cleanup hooks against scratch repositories.
 - Dependencies are not installed at creation. The first command that needs them installs them, in the
   home worktree and in each child inside it.
+
+### Cleanup
+
+A task worktree is retired as a whole: the child worktrees, their branches, the home worktree and its
+branch. `.claude/hooks/worktree-cleanup.sh` does it, and only for a worktree that is **proven**: nothing
+uncommitted in home or in a child, the home worktree's commit on another home branch, and every child
+branch landed. The script's header has the proofs. Anything unproven is left whole.
+
+- **At session start** every proven worktree that has been idle for three days is removed, and the rest
+  are listed with the reason each one stays. This runs in sessions started in the main home clone, not in
+  a task worktree. `.claude/hooks/worktree-cleanup.sh prune --report < /dev/null` lists without removing.
+- **At an interactive exit**, or when Claude leaves a worktree mid-session, the same proof decides with no
+  idle window. Claude Code only looks for changes in the home worktree and can remove without asking, so
+  the hook is the last check. An unproven worktree stays even when removal was chosen at the prompt.
+- **A subagent's worktree** is never removed by Claude Code. The session-start pass is what retires it.
+- To discard an unproven worktree, remove it by hand: `git worktree remove --force` in the child and then
+  in home, and `git branch -D` for both branches.
 
 ## Writing a shared file
 
