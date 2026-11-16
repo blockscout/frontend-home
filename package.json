@@ -3,7 +3,8 @@
   "private": true,
   "description": "Agent skills, rules and developer tools shared by Blockscout frontend repositories",
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "pnpm": ">=9.0.0"
   },
   "scripts": {
     "lint:tsc": "tsc -p tsconfig.json",
@@ -15,5 +16,6 @@
     "@types/node": "24.13.4",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
-  }
+  },
+  "packageManager": "pnpm@12.4.1"
 }

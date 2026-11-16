@@ -20,7 +20,7 @@ gitignored.
 already present is left as it is.
 
 Each child is listed in two ignore files: `.gitignore` keeps it out of home's history, and `.ignore` lets a
-search from the home root reach it. `npm run lint:children` fails when either file disagrees with
+search from the home root reach it. `pnpm lint:children` fails when either file disagrees with
 `children.txt`.
 
 ## Writing a shared file
@@ -29,5 +29,5 @@ A shared skill or rule is read while working in a child, the active child that `
 
 - Refer to another shared file by relative path (`./adr.md`).
 - Refer to a file the child owns by its path from the child's root (`.agents/GLOSSARY.md`). It resolves in
-  the active child, and `npm run lint:doc-links` looks for it in every child.
+  the active child, and `pnpm lint:doc-links` looks for it in every child.
 - Name a file in home itself as home's (home's `children.txt`).

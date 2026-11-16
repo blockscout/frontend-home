@@ -11,17 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.4.1
+          cache: true
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-      - run: npm run lint:children
-      - run: npm ci
-      - run: npm run lint:tsc
-      - run: npm test
+      - run: pnpm lint:children
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:tsc
+      - run: pnpm test
       # The shared skills and rules name the children's files, so doc-links checks them in the children.
       - name: Clone the children
         run: |
           git config --global url."https://github.com/".insteadOf git@github.com:
           ./scripts/bootstrap.sh --depth 1
-      - run: npm run lint:doc-links
+      - run: pnpm lint:doc-links

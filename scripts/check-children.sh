@@ -7,7 +7,7 @@
 set -eu
 
 root=$(cd "$(dirname "$0")/.." && pwd)
-marker='# Children, as listed in children.txt (npm run lint:children)'
+marker='# Children, as listed in children.txt (pnpm lint:children)'
 children=$("$root/scripts/children.sh")
 names=$(printf '%s\n' "$children" | cut -d ' ' -f 1)
 status=0
