@@ -1,6 +1,6 @@
 {
-  // Standalone on purpose: the tool is compiled inside whichever repository consumes it, so it
-  // must not extend a root config that differs per consumer.
+  // The build config: `prepare` and home's own run emit ./dist from it. The root tsconfig.json only
+  // type-checks, specs included.
   "compilerOptions": {
     "module": "node16",
     "target": "es2022",

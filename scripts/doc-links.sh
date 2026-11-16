@@ -13,4 +13,6 @@ for name in $(printf '%s\n' "$children" | cut -d ' ' -f 1); do
   set -- "$@" --child "$name"
 done
 
-exec "$root/tools/doc-links/run.sh" "$@"
+# Compiled on every run, so the check is the working tree's source and not the build left by the last install.
+"$root/node_modules/.bin/tsc" -p "$root/tools/doc-links/tsconfig.json"
+exec node "$root/tools/doc-links/dist/index.js" "$@"

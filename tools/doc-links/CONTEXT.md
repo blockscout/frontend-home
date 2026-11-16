@@ -1,8 +1,9 @@
 # Doc-link checker — context
 
-`run.sh` resolves the cross-references in the agent instruction surface of the repository it is run in —
-markdown links, heading anchors, and the file and directory paths written in backticks. A consumer wires it
-to a package script (`pnpm lint:doc-links`) and a CI check.
+`doc-links` resolves the cross-references in the agent instruction surface of the repository it is run in —
+markdown links, heading anchors, and the file and directory paths written in backticks. A consumer installs
+home as a pnpm git dependency pinned by commit, and wires the command to a package script
+(`pnpm lint:doc-links`) and a CI check.
 
 ## Files
 
@@ -15,17 +16,24 @@ to a package script (`pnpm lint:doc-links`) and a CI check.
 | `check.ts` | One file in, its findings out. The two reference forms — backtick path, markdown link — are checked here. |
 | `report.ts` | Findings to output lines and an exit code. Free of `console` so a spec can assert both. |
 | `index.ts` | CLI entry: repo root, tracked files, the loop, the printing. |
-| `run.sh`, `tsconfig.json` | Compile-on-run wrapper; the compiled output is git-ignored. |
+| `tsconfig.json` | The build into `dist`, which is git-ignored. The `prepare` script in home's `package.json` runs it at install, and `scripts/doc-links.sh` before home's own check. |
 
 ## What an editor here must keep true
 
 - **`ILLUSTRATION_FORMS` is the only statement of the exemption marks**, and it is printed on failure.
   Teaching the checker a new mark without amending that string leaves authors reading a footer that
   contradicts the tool.
-- **The repo root comes from git, asked from the working directory.** Asked from the entry file's own
-  location, it answers with the tool's own checkout rather than the repository that runs it.
-- **`tsconfig.json` extends nothing.** It is compiled by each consumer's compiler, across TypeScript
-  versions, so it cannot lean on a root config that only one of them has.
+- **The repo root comes from git, asked from the working directory.** The entry file's own location is
+  inside the consumer's `node_modules`, where git answers with nothing useful.
+- **No runtime dependencies.** A consumer gets the built files and nothing else. A tool that needs a
+  package at run time is out of scope for this delivery.
+- **`files` in home's `package.json` is what ships `dist`.** Without it the pack step follows `.gitignore`
+  and the consumer gets a command with no file behind it.
+- **Home keeps `pnpm-lock.yaml` and no other lockfile.** pnpm builds a git dependency with the package
+  manager its lockfile names, so a `package-lock.json` here makes the consumer's install run npm.
+- **A consumer allows the build by exact commit.** pnpm refuses a git dependency's `prepare` script unless
+  `allowBuilds` in the consumer's `pnpm-workspace.yaml` has the package with its commit; a name-only key is
+  rejected. Changing the pin is therefore two edits.
 - **Every path this directory's own docs write is checked by the tool they document.** A rename here that
   misses `CONTEXT.md` fails the run.
 

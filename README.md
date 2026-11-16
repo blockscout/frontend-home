@@ -14,7 +14,7 @@ gitignored.
 | `.claude/agents/` | Claude Code subagent definitions, which only Claude Code reads |
 | `children.txt` | The children, by name and repository URL |
 | `scripts/` | Cloning the children, the check that the ignore files list them, and the links to their skills |
-| `tools/` | Developer tools run in a child |
+| `tools/` | Developer tools a child installs from home as a pinned git dependency ([`tools/doc-links/CONTEXT.md`](tools/doc-links/CONTEXT.md)) |
 
 ## Children
 

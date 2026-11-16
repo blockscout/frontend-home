@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable no-console -- CLI tool, console output is the interface */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -18,8 +19,8 @@ import { collectSurface } from './surface';
 //
 // CLI entry only; everything worth a test lives in the modules beside it. See ./CONTEXT.md for the file map.
 
-// The root is the repository the command runs in, asked of git from the working directory. Asking from this
-// file's own location would answer with the devkit checkout when the tool is mounted as a submodule.
+// The root is the repository the command runs in, asked of git from the working directory. This file's own
+// location is no guide: installed as a dependency it sits in the consumer's `node_modules`.
 function repoRoot(): string {
   return execFileSync('git', [ 'rev-parse', '--show-toplevel' ], { cwd: process.cwd(), encoding: 'utf8' }).trim();
 }

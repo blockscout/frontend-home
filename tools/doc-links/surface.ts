@@ -21,16 +21,16 @@ const MARKDOWN = /\.mdc?$/;
 const isExcluded = (rel: string, extra: ReadonlyArray<string>): boolean =>
   [ ...EXCLUDED, ...extra ].some((ex) => `${ rel }/`.startsWith(`${ ex }/`));
 
-// A symlink is followed to what it points at. `.agents/skills/<name>` may link into a devkit submodule, and
-// the files behind it are part of this repository's instruction surface: the paths they name have to exist
-// here. A link onto a directory the walk reaches anyway (`.claude/skills` → `../.agents/skills`) yields the
+// A symlink is followed to what it points at. `.agents/skills/<name>` may link into another checkout, as
+// home's links into its children do, and the files behind it are part of this repository's instruction
+// surface: the paths they name have to exist here. A link onto a directory the walk reaches anyway (`.claude/skills` → `../.agents/skills`) yields the
 // same files a second time, which `dedupeByRealPath` drops.
 async function kindOf(root: string, rel: string, entry: Dirent): Promise<'directory' | 'file' | 'missing'> {
   if (!entry.isSymbolicLink()) return entry.isDirectory() ? 'directory' : 'file';
   try {
     return (await stat(path.join(root, rel))).isDirectory() ? 'directory' : 'file';
   } catch {
-    return 'missing'; // dangling link — an uninitialised submodule
+    return 'missing'; // dangling link — the checkout it points into is absent
   }
 }
 
