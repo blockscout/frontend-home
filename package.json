@@ -3,7 +3,7 @@
   "private": true,
   "description": "Agent skills, rules and developer tools shared by Blockscout frontend repositories",
   "engines": {
-    "node": ">=22",
+    "node": ">=24.21.0",
     "pnpm": ">=9.0.0"
   },
   "scripts": {
