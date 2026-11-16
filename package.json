@@ -11,7 +11,8 @@
     "lint:doc-links": "./scripts/doc-links.sh",
     "lint:children": "./scripts/check-children.sh",
     "lint:skill-links": "./scripts/skill-links.sh --check",
-    "test": "vitest run --dir tools"
+    "test": "vitest run --dir tools",
+    "test:hooks": "./.claude/hooks/tests/worktree-create.test.sh"
   },
   "devDependencies": {
     "@types/node": "24.13.4",
