@@ -1,18 +1,31 @@
 {
-  "name": "frontend-devkit",
+  "name": "frontend-home",
   "private": true,
+  "version": "0.0.0",
   "description": "Agent skills, rules and developer tools shared by Blockscout frontend repositories",
   "engines": {
-    "node": ">=22"
+    "node": ">=24.21.0",
+    "pnpm": ">=9.0.0"
   },
+  "bin": {
+    "doc-links": "tools/doc-links/dist/index.js"
+  },
+  "files": [
+    "tools/*/dist"
+  ],
   "scripts": {
+    "prepare": "tsc -p tools/doc-links/tsconfig.json",
     "lint:tsc": "tsc -p tsconfig.json",
-    "lint:doc-links": "./tools/doc-links/run.sh",
-    "test": "vitest run"
+    "lint:doc-links": "./scripts/doc-links.sh",
+    "lint:children": "./scripts/check-children.sh",
+    "lint:skill-links": "./scripts/skill-links.sh --check",
+    "test": "vitest run --dir tools",
+    "test:hooks": "./.claude/hooks/tests/worktree-create.test.sh && ./.claude/hooks/tests/worktree-cleanup.test.sh"
   },
   "devDependencies": {
     "@types/node": "24.13.4",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
-  }
+  },
+  "packageManager": "pnpm@12.4.1"
 }

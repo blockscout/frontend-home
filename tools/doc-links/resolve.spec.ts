@@ -43,6 +43,12 @@ describe('buildRepoIndex', () => {
   it('leaves out root-level files, which have no directory segment', () => {
     expect(repo.topLevel.has('package.json')).toBe(false);
   });
+
+  it('adds the top-level directories of each child', () => {
+    const withChild = buildRepoIndex(root, TRACKED, [ { root: path.join(root, 'frontend'), tracked: [ 'docs/ENVS.md' ] } ]);
+
+    expect([ ...withChild.topLevel ].sort()).toEqual([ '.agents', 'docs', 'src' ]);
+  });
 });
 
 describe('isPlaceholder', () => {
@@ -84,6 +90,14 @@ describe('resolves', () => {
     write('.agents/rules/docs.md');
 
     expect(resolves(repo, path.join(root, '.agents'), 'rules/docs.md')).toBe(path.join(root, '.agents/rules/docs.md'));
+  });
+
+  it('finds a path written from a child\'s root', () => {
+    write('frontend/docs/ENVS.md');
+    const child = path.join(root, 'frontend');
+    const withChild = buildRepoIndex(root, TRACKED, [ { root: child, tracked: [ 'docs/ENVS.md' ] } ]);
+
+    expect(resolves(withChild, path.join(root, '.agents'), 'docs/ENVS.md')).toBe(path.join(child, 'docs/ENVS.md'));
   });
 
   it('returns undefined when neither candidate exists', () => {

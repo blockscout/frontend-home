@@ -85,6 +85,24 @@ describe('the four reported classes', () => {
   });
 });
 
+describe('a child cloned inside the repository', () => {
+  beforeEach(() => {
+    const tracked = [ '.agents/GLOSSARY.md', 'docs/ENVS.md' ];
+    repo = buildRepoIndex(root, TRACKED, [ { root: path.join(root, 'frontend'), tracked } ]);
+    for (const rel of tracked) {
+      write(`frontend/${ rel }`);
+    }
+  });
+
+  it('accepts a path written from the child\'s root', async() => {
+    expect(await messagesFor('See `.agents/GLOSSARY.md`.')).toEqual([]);
+  });
+
+  it('reports a path into the child that resolves nowhere', async() => {
+    expect(await messagesFor('See `docs/GONE.md`.')).toEqual([ 'path reference does not exist: docs/GONE.md' ]);
+  });
+});
+
 describe('what is not a reference', () => {
   it.each([
     [ 'a fenced block', [ '```', '`src/api/gone.ts`', '[docs](./rules/gone.md)', '```' ] ],

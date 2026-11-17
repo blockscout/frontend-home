@@ -1,3 +1,11 @@
 node_modules
 dist
 .DS_Store
+
+# Children, as listed in children.txt (pnpm lint:children)
+/frontend/
+
+# Task worktrees (.claude/hooks/worktree-create.sh) and per-developer Claude Code settings
+/.claude/worktrees/
+/.claude/settings.local.json
+/.playwright-mcp/

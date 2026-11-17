@@ -1,5 +1,5 @@
 {
-  // Type-checks the tools together with their specs. Each tool compiles on run with its own tsconfig.json.
+  // Type-checks the tools together with their specs. Each tool is built with its own tsconfig.json.
   "compilerOptions": {
     "module": "node16",
     "target": "es2022",
