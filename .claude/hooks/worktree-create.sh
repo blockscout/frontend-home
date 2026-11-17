@@ -110,6 +110,15 @@ add_child() {
   copy_includes "$src" "$dest"
 }
 
+# refuse_checked_out <source checkout> <child> <branch>: git checks a branch out in one worktree only,
+# and would say so after the home worktree is made. A child already in the worktree is a reopening.
+refuse_checked_out() {
+  [ ! -e "$wt/$2/.git" ] || return 0
+  if git -C "$1" worktree list --porcelain | grep -Fqx "branch refs/heads/$3"; then
+    die "the branch $3 of $2 is checked out in another worktree: switch that one to another branch, or pick another name"
+  fi
+}
+
 from=$(session_root "$cwd")
 children=$("$here/scripts/children.sh" | cut -d ' ' -f 1)
 
@@ -126,6 +135,12 @@ if [ -n "$picked" ]; then
   [ -e "$home/$picked/.git" ] || die "the child $picked is not cloned in $home (scripts/bootstrap.sh)"
   git check-ref-format "refs/heads/$rest" || die "not usable as a branch name in $picked: $rest"
   base=$(remote_main "$home/$picked") || die "$picked has no remote main branch (origin/HEAD, origin/main, origin/master)"
+  refuse_checked_out "$home/$picked" "$picked" "$rest"
+else
+  for child in $children; do
+    [ -e "$from/$child/.git" ] || continue
+    refuse_checked_out "$from/$child" "$child" "$name"
+  done
 fi
 
 if [ ! -e "$wt/.git" ]; then

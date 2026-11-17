@@ -141,11 +141,12 @@ gh api -X POST repos/{owner}/{repo}/pulls/{N}/comments/{commentId}/replies \
 List unresolved threads with their node id and first comment's databaseId:
 
 ```bash
-gh api graphql -f query='
-query {
+gh api graphql --paginate -f query='
+query($endCursor: String) {
   repository(owner:"{owner}", name:"{repo}") {
     pullRequest(number:{N}) {
-      reviewThreads(first:50) {
+      reviewThreads(first:100, after:$endCursor) {
+        pageInfo { hasNextPage endCursor }
         nodes { id isResolved comments(first:1){ nodes { databaseId } } }
       }
     }

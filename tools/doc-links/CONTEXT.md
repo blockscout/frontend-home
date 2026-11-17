@@ -16,7 +16,7 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
 | `check.ts` | One file in, its findings out. The two reference forms — backtick path, markdown link — are checked here. |
 | `report.ts` | Findings to output lines and an exit code. Free of `console` so a spec can assert both. |
 | `index.ts` | CLI entry: repo root, tracked files, the loop, the printing. |
-| `tsconfig.json` | The build into `dist`, which is git-ignored. The `prepare` script in home's `package.json` runs it at install, and `scripts/doc-links.sh` before home's own check. |
+| `tsconfig.json` | The build into `dist`, which is git-ignored. |
 
 ## What an editor here must keep true
 
@@ -25,8 +25,8 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
   contradicts the tool.
 - **The repo root comes from git, asked from the working directory.** The entry file's own location is
   inside the consumer's `node_modules`, where git answers with nothing useful.
-- **No runtime dependencies.** A consumer gets the built files and nothing else. A tool that needs a
-  package at run time is out of scope for this delivery.
+- **No runtime dependencies.** A consumer gets the built files and nothing else. This is a phase-1
+  limit: delivering a tool that needs a package at run time is tracked in blockscout/frontend-home#6.
 - **`files` in home's `package.json` is what ships `dist`.** Without it the pack step follows `.gitignore`
   and the consumer gets a command with no file behind it.
 - **Home keeps `pnpm-lock.yaml` and no other lockfile.** pnpm builds a git dependency with the package
@@ -46,9 +46,7 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
   path that names a shape rather than a location (`types/api.ts`, `hooks/`) is deliberately not reported —
   the judgements in `resolve.ts` exist to keep it that way.
 - **Home's run needs every child cloned.** Shared skills and rules name a child's file by its path from the
-  child's root, so `scripts/doc-links.sh` passes each child as `--child`, and a root-relative path may
-  resolve in any of them. CI clones the children before the step. A child missing from the checkout stops
-  the run.
+  child's root, so a child missing from the checkout stops the run.
 - **`.cursor/rules/*.mdc` and `.claude/CLAUDE.md` are symlinks onto files under `.agents`.** Both the
   de-duplication and the realpath-relative resolution depend on that; drop either and every finding in a
   symlinked file is reported twice, or its relative links resolve from the wrong directory.

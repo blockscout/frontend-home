@@ -125,6 +125,15 @@ assert_eq "$status" 1 'exit status for a child that is not cloned'
 assert_eq "$out" '' 'no path on stdout'
 assert_absent "$wts/not-cloned-task"
 assert_eq "$(git -C "$home" branch --list not-cloned-task)" '' 'no home branch'
+run kid-local-work "$home"
+assert_eq "$status" 1 'exit status for a child branch that is checked out in the child clone'
+assert_absent "$wts/kid-local-work"
+assert_eq "$(git -C "$home" branch --list kid-local-work)" '' 'no home branch'
+git -C "$home/kid-extra" switch --quiet -c scratchpad
+run scratchpad "$home"
+assert_eq "$status" 1 'exit status for a mirror whose branch is checked out in a child clone'
+assert_absent "$wts/scratchpad"
+assert_eq "$(git -C "$home/kid" branch --list scratchpad)" '' 'no branch in the other child'
 git -C "$home/kid" remote remove origin
 run kid-task "$home"
 assert_eq "$status" 1 'exit status for a child with no remote main'

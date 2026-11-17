@@ -63,7 +63,10 @@ main() {
   here=$(cd "$(dirname "$0")/../.." && pwd -P)
   home_common=$(common_dir "$here") || quit "not in a git checkout: $here"
   home=$(dirname "$home_common")
-  children=$("$here/scripts/children.sh" 2>/dev/null | cut -d ' ' -f 1)
+  # On its own, not in a pipeline: a list that does not parse must stop the run, not read as no children,
+  # which would hide the child worktrees from the proof.
+  listed=$("$here/scripts/children.sh" 2>/dev/null) || quit 'children.txt does not parse (scripts/children.sh)'
+  children=$(printf '%s\n' "$listed" | cut -d ' ' -f 1)
 
   tmp=$(mktemp -d) || quit 'no temporary directory'
   trap 'rm -rf "$tmp"' EXIT
@@ -372,6 +375,8 @@ prune() {
   while IFS= read -r wt <&3; do
     [ -d "$wt" ] || continue
     [ "$(admin_dir "$wt")" != "$home_common" ] || continue
+    # A worktree made by hand elsewhere is not a task worktree, and not this hook's to remove.
+    [ "$(dirname "$wt")" = "$home/.claude/worktrees" ] || continue
     name=$(basename "$wt")
 
     case "$cwd/" in
@@ -421,8 +426,9 @@ remove() {
   fi
   wt=$(cd "$wt" && pwd -P)
 
-  # Only a linked worktree of this home, named by its root.
-  [ "$(git -C "$wt" rev-parse --show-toplevel 2> /dev/null)" = "$wt" ] &&
+  # Only a task worktree of this home: a linked worktree in .claude/worktrees, named by its root.
+  [ "$(dirname "$wt")" = "$home/.claude/worktrees" ] &&
+    [ "$(git -C "$wt" rev-parse --show-toplevel 2> /dev/null)" = "$wt" ] &&
     [ "$(common_dir "$wt")" = "$home_common" ] &&
     [ "$(admin_dir "$wt")" != "$home_common" ] ||
     quit "not a task worktree of $home: $wt"

@@ -311,6 +311,28 @@ prune
 assert_absent "$wts/kid-main"
 assert_eq "$(git -C "$home/kid" branch --list main | tr -d ' ')" main 'kid branch main'
 
+fresh 'prune: a children list that does not parse keeps every worktree' kid kid-extra
+create kid-task
+echo kid > "$home/children.txt"
+prune
+assert_eq "$status" 0 'exit status'
+assert_intact kid-task kid task
+remove "$wts/kid-task"
+assert_eq "$status" 1 'exit status of remove'
+assert_intact kid-task kid task
+assert_reports 'children.txt does not parse'
+
+fresh 'prune: a worktree outside .claude/worktrees is not a task worktree, and stays' kid kid-extra
+git -C "$home" worktree add --quiet -b by-hand "$scratch/by-hand"
+prune
+assert_eq "$out" '' 'no report'
+assert_eq "$(worktrees_at "$home" "$scratch/by-hand")" 1 'the worktree made by hand'
+assert_eq "$(branch_of "$scratch/by-hand")" by-hand 'its branch'
+remove "$scratch/by-hand"
+assert_eq "$status" 1 'exit status of remove'
+assert_eq "$(worktrees_at "$home" "$scratch/by-hand")" 1 'the worktree made by hand, after remove'
+rm -rf "$scratch/by-hand"
+
 fresh 'prune: inherited git variables do not redirect the hook' kid kid-extra
 create kid-task
 create kid-kept

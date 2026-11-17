@@ -146,7 +146,9 @@ gh run watch <databaseId> --exit-status          # blocks until the run complete
   an answer: poll the same command every 15 seconds for up to 2 minutes. A run that appears is the run to
   watch. Still none after the window → the workflow's `paths-ignore` skipped the push (agent docs, `docs/`,
   deploy values): the newest completed Checks run on the branch stands in for it, and **its** conclusion is
-  the one read below. No completed run on the branch at all counts as green.
+  the one read below. No completed run on the branch at all counts as green. With `--child home`
+  there is no such skip, because home's Checks workflow runs on every pull request: no run after the window
+  stops the loop, reported as a CI run that never registered.
 - **Pending** (`queued`, `in_progress`) → watch it to completion. Edit nothing while waiting.
 - **Green** (`success`) → in a `blocked` round, push and start the next round. After `cleared`, the loop
   ends at step 5 **only when `HEAD` equals `headRefOid`** — the green run is for the code on the PR. With
