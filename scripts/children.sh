@@ -10,6 +10,7 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 awk '
   /^[[:space:]]*(#|$)/ { next }
   NF != 2 { printf "children.txt:%d: expected `<name> <url>`, got: %s\n", NR, $0 > "/dev/stderr"; bad = 1; next }
+  $1 == "home" { printf "children.txt:%d: `home` is reserved for the home repo itself\n", NR > "/dev/stderr"; bad = 1; next }
   $1 !~ /^[a-z0-9][a-z0-9._-]*$/ { printf "children.txt:%d: not a directory name: %s\n", NR, $1 > "/dev/stderr"; bad = 1; next }
   seen[$1]++ { printf "children.txt:%d: listed twice: %s\n", NR, $1 > "/dev/stderr"; bad = 1; next }
   { print $1, $2 }

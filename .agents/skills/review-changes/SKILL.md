@@ -22,7 +22,7 @@ without it stops rather than guessing.
 | Input | Values | Default | Meaning |
 | --- | --- | --- | --- |
 | `output` *(positional)* | `pr` · `md` | **required** | where the findings are published |
-| `--child <name>` | a child in home's `children.txt` | deduced | the repository under review ([The child](#the-child)) |
+| `--child <name>` | a child in home's `children.txt`, or `home` | deduced | the repository under review ([The child](#the-child)) |
 | `--round` | `first` · `follow-up` | `first` | `follow-up` is arbitration (step 3), never a fresh pass |
 | `--scope` | `branch` · `uncommitted` | `branch` | what to diff. `md` only |
 | `--as <tag>` | short slug (`cursor`, `codex`) | none | namespaces the findings, for concurrent reviewers |
@@ -31,6 +31,7 @@ without it stops rather than guessing.
 ```
 /review-changes pr                              round 1 on the PR of the deduced child's current branch
 /review-changes pr --child frontend             the same, with the child named
+/review-changes pr --child home                 round 1 on the PR of home's own current branch
 /review-changes pr --round follow-up            arbitrate the rulings on that PR
 /review-changes md --scope uncommitted          the ticket in flight, before it is committed
 /review-changes pr --as cursor                  a second reviewer on a PR another agent already reviewed
@@ -51,10 +52,12 @@ processes (a reviewer CLI, subagents) and every one of them has to land in the s
 
 - **Without `--child`, the child is deduced**, and the first probe that names one child wins:
   1. A PR or comment url among the inputs → the child whose repository in home's `children.txt` is the
-     url's `owner/repo`. A url of any other repository stops the run.
+     url's `owner/repo`, or `home` when that is home's own repository (`gh repo view` at the session's
+     root). A url of any other repository stops the run.
   2. One child directory present at the session's root, as a task worktree made for one child has → that
      child. Home's `scripts/children.sh` prints the names to look for.
-  3. The active child, as home's `.agents/AGENTS.md` infers it from the request.
+  3. The active child, as home's `.agents/AGENTS.md` infers it from the request. A request about home's
+     own files settles on `home`.
 
   When none of them settles on one child, ask. A headless run has nobody to ask and stops.
 - **Every `git`, `gh` and `pnpm` command in this skill and its supporting files runs in the child's
@@ -65,6 +68,17 @@ processes (a reviewer CLI, subagents) and every one of them has to land in the s
   [`axes.md`](axes.md), is a home file beside this one.
 - **Every subagent is given the child's name and absolute path** with its brief, so it does not work out
   the repository for itself.
+
+**`--child home` reviews home itself.** `home` is a reserved name, and `children.txt` never lists it. The
+repository is home and its directory is the session's root. Wherever the review skills and their supporting
+files say "the child", read home. Four things differ:
+
+- **Home has no task folder, spec or `.agents/delegation.md`.** The spec axis does not run. The `md` output
+  stops, because it has no task folder to write into.
+- **The rules are home's own**, in `.agents/rules/`. Read them once.
+- **The repo checks are the `lint:*` and `test*` scripts in home's `package.json`.**
+- **A child cloned inside home is another repository.** It is gitignored. Leave its files out of the
+  review and out of the fixes.
 
 ### `--as` and concurrent reviewers
 

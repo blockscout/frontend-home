@@ -25,7 +25,7 @@ also runs by hand on any open PR; `create-pr` never offers it.
 | Input | Values | Default | Meaning |
 | --- | --- | --- | --- |
 | `target` *(positional)* | PR url | the open PR of the child's current branch | the PR under review |
-| `--child <name>` | a child in home's `children.txt` | deduced | the repository the PR belongs to |
+| `--child <name>` | a child in home's `children.txt`, or `home` | deduced | the repository the PR belongs to |
 | `--reviewer <name>` | a file in [`reviewers/`](reviewers/) | `cursor` | which reviewer runs the rounds |
 | `--model <id>` | a model id the reviewer's CLI accepts | the reviewer's default | model override, passed through |
 
@@ -33,6 +33,7 @@ also runs by hand on any open PR; `create-pr` never offers it.
 /review-loop                                     the PR of the deduced child's current branch, reviewed by cursor
 /review-loop --child frontend                    the same, with the child named
 /review-loop https://github.com/o/r/pull/12      that PR, in the child whose repository is o/r
+/review-loop --child home                        the PR of home's own current branch
 /review-loop --model gpt-5                       cursor, on the named model
 ```
 
@@ -40,7 +41,8 @@ also runs by hand on any open PR; `create-pr` never offers it.
 and the PR is a child's: [`../review-changes/SKILL.md`](../review-changes/SKILL.md#the-child) has the
 probe that deduces it and the rules, and they bind this file and [`ci-fixes.md`](ci-fixes.md) the same way. "The tree"
 below is the child's tree, and every `git` and `gh` command runs in the child's directory. The reviewer and
-the resolver each get `--child <name>`, never a default of their own to work out.
+the resolver each get `--child <name>`, never a default of their own to work out. A PR of home itself runs
+with `--child home`, and the tree is then the home worktree.
 
 **The reviewer file is the provider seam.** Everything specific to one provider — binary, flags, time
 limit, failure detection, retry — lives in `reviewers/<name>.md`, and the reviewer's **tag** is its name.
