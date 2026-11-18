@@ -35,6 +35,7 @@ also runs by hand on any open PR; `create-pr` never offers it.
 /review-loop https://github.com/o/r/pull/12      that PR, in the child whose repository is o/r
 /review-loop --child home                        the PR of home's own current branch
 /review-loop --model gpt-5                       cursor, on the named model
+/review-loop --reviewer claude-code              the same PR, reviewed by claude-code
 ```
 
 **The child is settled once, here, and handed to everything the loop launches.** The loop runs from home
@@ -96,8 +97,8 @@ between the resolver's return and that push.
 **Bounds.** Three review rounds. A third round that still reads `blocked` is resolved like the others —
 resolver, `needs-human` pause, CI wait, one push — and then the loop ends with a report instead of a fourth
 review; the report says the round-3 fixes landed unverified by the reviewer. The reviewer's own stops — a
-transport failure that survived its retry, a timeout, an agent that finished without posting — end the loop
-too.
+transport failure that survived its retry, a timeout, an agent that finished without posting, any other
+stop its file names — end the loop too.
 
 **Done when**: the outcome is `cleared` and the current `HEAD` is green, or a bound or a reviewer stop has
 been hit.
@@ -188,5 +189,6 @@ to the PR's `headRefOid`. A stop that leaves local commits behind pushes them fi
 Then report in the terminal: the PR url, the outcome (`cleared` and green, or why the loop stopped — rounds
 exhausted, post-clear CI-fix cycles exhausted, reviewer failure after its retry, timeout), the number of
 rounds run and of post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
-counts from the last resolver report, and anything left open — `deferred` nits and `answered` human threads
-stay as open threads for the developer. Leave the PR's threads as the reviewer and the resolver left them.
+counts from the last resolver report, whatever the reviewer file says to carry into the report, and anything
+left open — `deferred` nits and `answered` human threads stay as open threads for the developer. Leave the
+PR's threads as the reviewer and the resolver left them.
