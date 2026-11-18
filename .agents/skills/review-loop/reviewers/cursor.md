@@ -25,17 +25,10 @@ agent -p --trust --approve-mcps --output-format json [--model <id>] \
 Launch the invocation in the background, under the watchdog, and poll it as [`_shared.md`](_shared.md)
 says.
 
-## Failure detection
+## Failure signals
 
-Read the exit code and stdout, then check the PR, from the child's directory, for a review posted since the start time whose body ends
-in `— Reviewed by cursor …` (the `reviews` endpoint in
-[`../../review-changes/gh-commands.md`](../../review-changes/gh-commands.md)).
+The terms [`_shared.md`](_shared.md#deciding-the-run) decides the run by. Read them from the exit code and
+stdout:
 
-| Observation | Meaning | Action |
-| --- | --- | --- |
-| Footer-bearing review newer than the start time | the review ran | read its outcome; the exit code is irrelevant |
-| No such review, exit `124` | timeout | stop the loop |
-| No such review, exit non-zero other than `124`, or empty stdout | transport failure | retry once, same invocation; this row again on the retry is a reviewer failure: stop the loop |
-| No such review, exit `0`, non-empty stdout | the agent ran to completion but posted nothing | stop the loop; report that the agent finished without a footer-bearing review |
-
-The table is read as [`_shared.md`](_shared.md#reading-a-failure-table) says.
+- **Transport failure**: exit non-zero other than `124`, or empty stdout.
+- **Provider stop**: none.

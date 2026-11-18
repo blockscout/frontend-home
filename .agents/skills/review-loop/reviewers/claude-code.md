@@ -34,27 +34,19 @@ claude -p --output-format json --permission-mode auto --strict-mcp-config \
 Launch the invocation in the background, under the watchdog, and poll it as [`_shared.md`](_shared.md)
 says.
 
-## Failure detection
+## Failure signals
 
-Read the exit code and the result, then check the PR, from the child's directory, for a review posted since
-the start time whose body ends in `— Reviewed by claude-code …` (the `reviews` endpoint in
-[`../../review-changes/gh-commands.md`](../../review-changes/gh-commands.md)).
+The terms [`_shared.md`](_shared.md#deciding-the-run) decides the run by. Read them from the exit code and
+the result:
 
 ```bash
 jq '{is_error, subtype, denied: [.permission_denials[]?.tool_name]}' <scratchpad>/review-<round>.json
 ```
 
-| Observation | Meaning | Action |
-| --- | --- | --- |
-| Footer-bearing review newer than the start time | the review ran | read its outcome; the exit code is irrelevant |
-| No such review, exit `124` | timeout | stop the loop |
-| No such review, `denied` non-empty | no review; denials present | stop the loop; report `no review; denials present:` and the denied tools |
-| No such review, and exit non-zero other than `124`, empty stdout, or `is_error: true` | transport failure | retry once, same invocation; this row again on the retry is a reviewer failure: stop the loop |
-| No such review, exit `0`, `is_error: false` | the agent ran to completion but posted nothing | stop the loop; report that the agent finished without a footer-bearing review |
-
-The table is read as [`_shared.md`](_shared.md#reading-a-failure-table) says. A run that ended with denials
-and no review gets no retry either: the result does not say whether a denial is what stopped it, and where
-one did, auto mode refuses the same call again.
+- **Transport failure**: exit non-zero other than `124`, empty stdout, or `is_error: true`.
+- **Provider stop**: `denied` non-empty. Report `no review; denials present:` and the denied tools. The
+  result does not say whether a denial is what stopped the run, and where one did, auto mode refuses the
+  same call again.
 
 **Denials go in the loop's report whenever `denied` is non-empty**, a round whose review ran included: name
 the round and the tools. A review that worked around a refused call may have covered less than it says.

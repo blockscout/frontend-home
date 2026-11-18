@@ -46,8 +46,8 @@ the resolver each get `--child <name>`, never a default of their own to work out
 with `--child home`, and the tree is then the home worktree.
 
 **The reviewer file is the provider seam.** Everything specific to one provider — binary, flags, failure
-detection, retry — lives in `reviewers/<name>.md`, and the reviewer's **tag** is its name. What every
-provider shares — the background run, its time limit, the polling, how a failure table is read — is
+signals — lives in `reviewers/<name>.md`, and the reviewer's **tag** is its name. What every provider
+shares — the background run, its time limit, the polling, the table that decides a run, the retry — is
 [`reviewers/_shared.md`](reviewers/_shared.md), which is not a reviewer and never a `--reviewer` value.
 This file speaks only of "the reviewer". Every reviewer run passes `--as <name>`, which is what satisfies
 `review-changes`' guard against overwriting another reviewer's threads
@@ -73,8 +73,9 @@ Rounds are numbered from 1. Each round:
 1. **Review.** Run the reviewer as its file and `reviewers/_shared.md` say: `review-changes pr --as <name>
    --child <child>`, with `--round follow-up` on every round after the first. It runs in the background and is polled to
    completion. While it runs, **edit nothing** in the child's tree — the reviewer reads the working copy for
-   the code the diff points at, and an edit under it is a finding against code that does not exist. The file
-   says what counts as a transport failure (one retry) and what counts as a review that ran (no retry).
+   the code the diff points at, and an edit under it is a finding against code that does not exist.
+   `reviewers/_shared.md` decides the run: a review that ran (no retry), a transport failure (one retry), or
+   a stop.
 2. **Read the outcome from the PR**, never from the CLI's text — it can be truncated and the PR is the
    record. Among the PR-level reviews (`gh api repos/{owner}/{repo}/pulls/{N}/reviews --paginate`, in
    `gh-commands.md`; without the flag a PR past its first 30 reviews returns none of the newest), take the
@@ -99,7 +100,7 @@ between the resolver's return and that push.
 **Bounds.** Three review rounds. A third round that still reads `blocked` is resolved like the others —
 resolver, `needs-human` pause, CI wait, one push — and then the loop ends with a report instead of a fourth
 review; the report says the round-3 fixes landed unverified by the reviewer. The reviewer's own stops — a
-transport failure that survived its retry, a timeout, an agent that finished without posting, any other
+transport failure that survived its retry, a timeout, an agent that finished without posting, a provider
 stop its file names — end the loop too.
 
 **Done when**: the outcome is `cleared` and the current `HEAD` is green, or a bound or a reviewer stop has
@@ -190,7 +191,7 @@ to the PR's `headRefOid`. A stop that leaves local commits behind pushes them fi
 
 Then report in the terminal: the PR url, the outcome (`cleared` and green, or why the loop stopped — rounds
 exhausted, post-clear CI-fix cycles exhausted, reviewer failure after its retry, timeout, an agent that
-finished without posting, or another stop the reviewer file names), the number of rounds run and of
+finished without posting, or a provider stop the reviewer file names), the number of rounds run and of
 post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
 counts from the last resolver report, whatever the reviewer file says to carry into the report, and anything
 left open — `deferred` nits and `answered` human threads stay as open threads for the developer. Leave the

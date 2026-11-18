@@ -1,7 +1,7 @@
 # Running a reviewer: the shared procedure
 
 **Not a reviewer.** `--reviewer` never names this file; the underscore marks it. Every reviewer file in this
-directory gives its own invocation, flags and failure table, and is run and read as below.
+directory gives its own invocation, flags and failure signals, and is run and decided as below.
 
 ## Background run and polling
 
@@ -35,15 +35,36 @@ echo "$rc" > <scratchpad>/review-<round>.exit
 first line clears what an earlier run left under the same names: a retry of the same round, or another loop
 in the same session, would otherwise find a stale exit file and read it as its own.
 
-Record the start time first (`date -u +%FT%TZ`); the outcome check in the reviewer file compares against it.
+Record the start time first (`date -u +%FT%TZ`); [Deciding the run](#deciding-the-run) compares against it.
 The background call reports back when the script exits; until then, poll for the exit file and edit nothing
 in the child's tree.
 
-## Reading a failure table
+## Deciding the run
+
+Every provider is decided by this one table. The reviewer file's **Failure signals** section supplies the
+two provider-specific terms the table uses: what a **transport failure** looks like in that CLI's result,
+and any **provider stop**.
+
+First check the PR, from the child's directory, for a review posted since the start time whose body ends in
+`— Reviewed by <name> …` (the `reviews` endpoint in
+[`../../review-changes/gh-commands.md`](../../review-changes/gh-commands.md)). Then read the exit code and
+the result as the reviewer file says.
+
+| Observation | Meaning | Action |
+| --- | --- | --- |
+| Footer-bearing review newer than the start time | the review ran | read its outcome; the exit code is irrelevant |
+| No such review, exit `124` | timeout | stop the loop |
+| No such review, a provider stop matches | the stop the reviewer file names | stop the loop; report it in the reviewer file's words |
+| No such review, a transport failure signal | transport failure | retry once, same invocation; this row again on the retry is a reviewer failure: stop the loop |
+| No such review, no row above matches | the agent ran to completion but posted nothing | stop the loop; report that the agent finished without a footer-bearing review |
 
 Rows are tested top to bottom; the first match rules. A retry's result is tested against the same table from
 the top.
 
-A review that ran gets no retry, whatever the CLI reported: a second `first` round would post a duplicate
-set of findings under the same tag. Nor does an agent that finished without posting — the retry would repeat
-the same thirty minutes to the same end.
+Only a transport failure is retried:
+
+- **A review that ran** would post a duplicate set of findings under the same tag on a second `first` round,
+  whatever the CLI reported.
+- **An agent that finished without posting** would repeat the same thirty minutes to the same end.
+- **A provider stop** is tested before the transport row because the reviewer file names it as a condition a
+  retry does not clear.
