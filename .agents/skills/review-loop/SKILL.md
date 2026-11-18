@@ -26,7 +26,7 @@ also runs by hand on any open PR; `create-pr` never offers it.
 | --- | --- | --- | --- |
 | `target` *(positional)* | PR url | the open PR of the child's current branch | the PR under review |
 | `--child <name>` | a child in home's `children.txt`, or `home` | deduced | the repository the PR belongs to |
-| `--reviewer <name>` | a file in [`reviewers/`](reviewers/) | `cursor` | which reviewer runs the rounds |
+| `--reviewer <name>` | a reviewer file in [`reviewers/`](reviewers/) | `cursor` | which reviewer runs the rounds |
 | `--model <id>` | a model id the reviewer's CLI accepts | the reviewer's default | model override, passed through |
 
 ```
@@ -35,7 +35,7 @@ also runs by hand on any open PR; `create-pr` never offers it.
 /review-loop https://github.com/o/r/pull/12      that PR, in the child whose repository is o/r
 /review-loop --child home                        the PR of home's own current branch
 /review-loop --model gpt-5                       cursor, on the named model
-/review-loop --reviewer claude-code              the same PR, reviewed by claude-code
+/review-loop --reviewer claude-code              the PR of the deduced child's current branch, reviewed by claude-code
 ```
 
 **The child is settled once, here, and handed to everything the loop launches.** The loop runs from home
@@ -45,8 +45,10 @@ below is the child's tree, and every `git` and `gh` command runs in the child's 
 the resolver each get `--child <name>`, never a default of their own to work out. A PR of home itself runs
 with `--child home`, and the tree is then the home worktree.
 
-**The reviewer file is the provider seam.** Everything specific to one provider — binary, flags, time
-limit, failure detection, retry — lives in `reviewers/<name>.md`, and the reviewer's **tag** is its name.
+**The reviewer file is the provider seam.** Everything specific to one provider — binary, flags, failure
+detection, retry — lives in `reviewers/<name>.md`, and the reviewer's **tag** is its name. What every
+provider shares — the background run, its time limit, the polling, how a failure table is read — is
+[`reviewers/_shared.md`](reviewers/_shared.md), which is not a reviewer and never a `--reviewer` value.
 This file speaks only of "the reviewer". Every reviewer run passes `--as <name>`, which is what satisfies
 `review-changes`' guard against overwriting another reviewer's threads
 ([`../review-changes/SKILL.md`](../review-changes/SKILL.md), "`--as` and concurrent reviewers").
@@ -60,7 +62,7 @@ tree is clean and `HEAD` equals the PR's
 `headRefOid` — the reviewer reads the PR diff, so a local commit it cannot see is a review of the wrong
 code. A `HEAD` ahead of the PR is pushed here; a dirty tree stops the run.
 
-Read the reviewer file `reviewers/<name>.md` and keep it open for the rounds.
+Read the reviewer file `reviewers/<name>.md` and `reviewers/_shared.md`, and keep both open for the rounds.
 
 **Done when**: the child and the PR are known, the PR is pushed, and the tree is clean.
 
@@ -68,8 +70,8 @@ Read the reviewer file `reviewers/<name>.md` and keep it open for the rounds.
 
 Rounds are numbered from 1. Each round:
 
-1. **Review.** Run the reviewer as its file says: `review-changes pr --as <name> --child <child>`, with
-   `--round follow-up` on every round after the first. It runs in the background and is polled to
+1. **Review.** Run the reviewer as its file and `reviewers/_shared.md` say: `review-changes pr --as <name>
+   --child <child>`, with `--round follow-up` on every round after the first. It runs in the background and is polled to
    completion. While it runs, **edit nothing** in the child's tree — the reviewer reads the working copy for
    the code the diff points at, and an edit under it is a finding against code that does not exist. The file
    says what counts as a transport failure (one retry) and what counts as a review that ran (no retry).
@@ -187,8 +189,9 @@ Before anything is said, confirm the PR is in a **consistent pushed state**: a c
 to the PR's `headRefOid`. A stop that leaves local commits behind pushes them first.
 
 Then report in the terminal: the PR url, the outcome (`cleared` and green, or why the loop stopped — rounds
-exhausted, post-clear CI-fix cycles exhausted, reviewer failure after its retry, timeout), the number of
-rounds run and of post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
+exhausted, post-clear CI-fix cycles exhausted, reviewer failure after its retry, timeout, an agent that
+finished without posting, or another stop the reviewer file names), the number of rounds run and of
+post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
 counts from the last resolver report, whatever the reviewer file says to carry into the report, and anything
 left open — `deferred` nits and `answered` human threads stay as open threads for the developer. Leave the
 PR's threads as the reviewer and the resolver left them.
