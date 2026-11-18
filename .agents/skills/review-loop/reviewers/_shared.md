@@ -9,9 +9,13 @@ The run exceeds the foreground command cap, so launch it as **one Bash call with
 (the Claude Code flag `release` uses for the same kind of long command), with stdout and the exit code
 captured to the scratchpad. The **30-minute deadline** is the script's own: macOS ships no `timeout` and a
 reviewer CLI has no wall-clock limit to rely on, so a shell watchdog kills the run and records exit `124`
-itself — the same code `timeout` would give. Pass no `timeout` on the Bash call: a tool limit at or under
-the watchdog's would end the script before it could record anything, and a real timeout would read as a
-transport failure.
+itself — the same code `timeout` would give.
+
+Pass **`timeout: 2100000`** (35 minutes) on the Bash call. A session Claude Code runs unattended — `-p`, an
+Agent SDK application, CI, a cloud session — stops a background command at a limit of its own, 30 minutes by
+default and 10 in a `-p` run. A limit at or under the watchdog's ends the script before it records anything,
+and a real timeout then reads as a transport failure. In another harness, give the background command a
+limit above 30 minutes by whatever means it has.
 
 ```bash
 rm -f <scratchpad>/review-<round>.{json,err,exit,timeout}
