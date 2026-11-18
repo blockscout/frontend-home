@@ -14,8 +14,7 @@ claude -p --output-format json --permission-mode auto --strict-mcp-config \
   "/review-changes pr --as claude-code --child <child> [--round follow-up]"
 ```
 
-- `--child <child>` on every run, the child the loop settled. A headless run has nobody to ask for it.
-- `--round follow-up` on every round after the first; the first round passes no `--round`.
+- `--child` and `--round` are filled in as [`_shared.md`](_shared.md#background-run-and-polling) says.
 - `--model <id>` is the loop's `--model` when it was given one. Otherwise `claude-opus-5-5`.
 - `--permission-mode auto` is mandatory. A `-p` run denies every tool call that would prompt, and the
   project's allow rules do not load in a worktree that was never trusted. Auto mode rules on each call
@@ -40,7 +39,7 @@ The terms [`_shared.md`](_shared.md#deciding-the-run) decides the run by. Read t
 the result:
 
 ```bash
-jq '{is_error, subtype, denied: [.permission_denials[]?.tool_name]}' <scratchpad>/review-<round>.json
+jq '{is_error, denied: [.permission_denials[]?.tool_name]}' <scratchpad>/review-<round>.json
 ```
 
 - **Transport failure**: exit non-zero other than `124`, empty stdout, or `is_error: true`.

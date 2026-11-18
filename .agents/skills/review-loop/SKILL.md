@@ -99,9 +99,9 @@ between the resolver's return and that push.
 
 **Bounds.** Three review rounds. A third round that still reads `blocked` is resolved like the others —
 resolver, `needs-human` pause, CI wait, one push — and then the loop ends with a report instead of a fourth
-review; the report says the round-3 fixes landed unverified by the reviewer. The reviewer's own stops — a
-transport failure that survived its retry, a timeout, an agent that finished without posting, a provider
-stop its file names — end the loop too.
+review; the report says the round-3 fixes landed unverified by the reviewer. The reviewer's own stops —
+every `stop the loop` row of the table in [`reviewers/_shared.md`](reviewers/_shared.md#deciding-the-run) —
+end the loop too.
 
 **Done when**: the outcome is `cleared` and the current `HEAD` is green, or a bound or a reviewer stop has
 been hit.
@@ -190,8 +190,8 @@ Before anything is said, confirm the PR is in a **consistent pushed state**: a c
 to the PR's `headRefOid`. A stop that leaves local commits behind pushes them first.
 
 Then report in the terminal: the PR url, the outcome (`cleared` and green, or why the loop stopped — rounds
-exhausted, post-clear CI-fix cycles exhausted, reviewer failure after its retry, timeout, an agent that
-finished without posting, or a provider stop the reviewer file names), the number of rounds run and of
+exhausted, post-clear CI-fix cycles exhausted, or the reviewer's stop, in the words of its row in the
+[`reviewers/_shared.md`](reviewers/_shared.md#deciding-the-run) table), the number of rounds run and of
 post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
 counts from the last resolver report, whatever the reviewer file says to carry into the report, and anything
 left open — `deferred` nits and `answered` human threads stay as open threads for the developer. Leave the

@@ -10,8 +10,7 @@ agent -p --trust --approve-mcps --output-format json [--model <id>] \
   "/review-changes pr --as cursor --child <child> [--round follow-up]"
 ```
 
-- `--child <child>` on every run, the child the loop settled. A headless run has nobody to ask for it.
-- `--round follow-up` on every round after the first; the first round passes no `--round`.
+- `--child` and `--round` are filled in as [`_shared.md`](_shared.md#background-run-and-polling) says.
 - `--model <id>` only when the loop was given one. Otherwise Cursor's default model.
 - `--trust --approve-mcps` are mandatory: trust and MCP approval are per absolute path, so a fresh
   worktree prompts without them and a headless run hangs on the prompt.

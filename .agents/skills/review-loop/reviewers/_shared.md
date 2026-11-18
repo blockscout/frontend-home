@@ -31,9 +31,14 @@ echo "$rc" > <scratchpad>/review-<round>.exit
 ```
 
 `<invocation>` is the command from the reviewer file's Invocation section, filled in per the rules under it
-— this script is what runs, so a round-2 run without `--round follow-up` is a second `first` round. The
-first line clears what an earlier run left under the same names: a retry of the same round, or another loop
-in the same session, would otherwise find a stale exit file and read it as its own.
+and these two, which hold for every provider:
+
+- `--child <child>` on every run, the child the loop settled. A headless run has nobody to ask for it.
+- `--round follow-up` on every round after the first; the first round passes no `--round`. This script is
+  what runs, so a round-2 run without it is a second `first` round.
+
+The script's first line clears what an earlier run left under the same names: a retry of the same round, or
+another loop in the same session, would otherwise find a stale exit file and read it as its own.
 
 Record the start time first (`date -u +%FT%TZ`); [Deciding the run](#deciding-the-run) compares against it.
 The background call reports back when the script exits; until then, poll for the exit file and edit nothing
