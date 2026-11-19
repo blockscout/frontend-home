@@ -314,8 +314,12 @@ verdict() {
   h_proof=''
   if [ -z "$(other_ref "$home" "$h_branch" "$h_tip")" ]; then
     # Home's pull requests are squash-merged too, so the merged one with this tip as its head proves it.
-    pr_state=unknown
-    [ -z "$h_branch" ] || pr_check "$home" "$h_branch" "$h_tip" false
+    # A detached checkout has no branch a pull request could be on.
+    if [ -z "$h_branch" ]; then
+      keep='home commits that are on no branch (detached)'
+      return
+    fi
+    pr_check "$home" "$h_branch" "$h_tip" false
     case $pr_state in
       merged) h_proof=$pr_url ;;
       open)
@@ -323,11 +327,11 @@ verdict() {
         return
         ;;
       none)
-        keep="home commits that are on no other branch${h_branch:+ (branch $h_branch)}"
+        keep="home commits that are on no other branch (branch $h_branch)"
         return
         ;;
       *)
-        keep="home commits that are on no other branch${h_branch:+ (branch $h_branch)}, GitHub not asked"
+        keep="home commits that are on no other branch (branch $h_branch), GitHub not asked"
         return
         ;;
     esac

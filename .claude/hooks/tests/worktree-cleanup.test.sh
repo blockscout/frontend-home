@@ -305,6 +305,16 @@ remove "$wts/kid-task"
 assert_eq "$status" 0 'exit status of remove'
 assert_gone kid-task kid task
 
+fresh 'prune: a detached home checkout with commits of its own is kept, and GitHub is not asked' kid kid-extra
+create kid-task
+work "$wts/kid-task"
+git -C "$wts/kid-task" switch --quiet --detach
+work "$wts/kid-task"
+prune
+assert_eq "$(worktrees_at "$home" "$wts/kid-task")" 1 'home worktree kid-task'
+assert_reports 'kid-task: home commits that are on no branch (detached)'
+assert_eq "$(cat "$GH_STUB/calls" 2> /dev/null)" '' 'GitHub is not asked about a detached checkout'
+
 fresh 'prune: a locked worktree is kept' kid kid-extra
 create kid-task
 git -C "$home/kid" worktree lock "$wts/kid-task/kid"
