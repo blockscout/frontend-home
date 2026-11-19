@@ -280,6 +280,31 @@ git -C "$home" merge --quiet kid-task
 prune
 assert_gone kid-task kid task
 
+fresh 'prune: a merged home pull request whose head is the home tip is the proof' kid kid-extra
+create kid-task
+work "$wts/kid-task"
+: > "$GH_STUB/down"
+prune
+rm "$GH_STUB/down"
+assert_intact kid-task kid task
+assert_reports 'kid-task: home commits that are on no other branch (branch kid-task), GitHub not asked'
+pr home OPEN kid-task "$(head_of "$wts/kid-task")"
+prune
+assert_intact kid-task kid task
+assert_reports 'kid-task: open PR on home branch kid-task'
+rm "$GH_STUB/home.json"
+pr home MERGED kid-task "$(head_of "$wts/kid-task")"
+prune --report
+assert_reports 'kid-task: prunable, clean, idle and landed (kid in remotes/origin/main, home https://example.com/pr/kid-task)'
+work "$wts/kid-task"
+prune
+assert_intact kid-task kid task
+assert_reports 'kid-task: home commits that are on no other branch (branch kid-task)'
+pr home MERGED kid-task "$(head_of "$wts/kid-task")"
+remove "$wts/kid-task"
+assert_eq "$status" 0 'exit status of remove'
+assert_gone kid-task kid task
+
 fresh 'prune: a locked worktree is kept' kid kid-extra
 create kid-task
 git -C "$home/kid" worktree lock "$wts/kid-task/kid"
