@@ -11,7 +11,8 @@
 # A worktree is proven when nothing in it exists only there:
 #
 #   - no uncommitted change in the home worktree or in any child inside it;
-#   - the home worktree's commit is on another home branch, so its own branch holds nothing;
+#   - the home worktree's commit is on another home branch, so its own branch holds nothing, or a merged
+#     home pull request has exactly that commit as its head. An open pull request on the branch keeps it;
 #   - every child branch has landed, by the proof `frontend`'s own worktree-prune.sh uses: its tip is an
 #     ancestor of the child's main branch, or a merged pull request has exactly that tip as its head.
 #     Pull requests are squash-merged, so the second is the one that fires. An open pull request on the
@@ -310,9 +311,30 @@ verdict() {
     keep='no home commit checked out'
     return
   }
+  h_proof=''
   if [ -z "$(other_ref "$home" "$h_branch" "$h_tip")" ]; then
-    keep="home commits that are on no other branch${h_branch:+ (branch $h_branch)}"
-    return
+    # Home's pull requests are squash-merged too, so the merged one with this tip as its head proves it.
+    # A detached checkout has no branch a pull request could be on.
+    if [ -z "$h_branch" ]; then
+      keep='home commits that are on no branch (detached)'
+      return
+    fi
+    pr_check "$home" "$h_branch" "$h_tip" false
+    case $pr_state in
+      merged) h_proof=$pr_url ;;
+      open)
+        keep="open PR on home branch $h_branch"
+        return
+        ;;
+      none)
+        keep="home commits that are on no other branch (branch $h_branch)"
+        return
+        ;;
+      *)
+        keep="home commits that are on no other branch (branch $h_branch), GitHub not asked"
+        return
+        ;;
+    esac
   fi
 
   for child in $inside; do
@@ -324,6 +346,7 @@ verdict() {
     landed="${landed:+$landed, }$child $proof"
   done
   [ -n "$landed" ] || landed='no child inside'
+  [ -z "$h_proof" ] || landed="$landed, home $h_proof"
 
   if [ "$mode" = prune ] && [ "$newest" -gt "$idle_cutoff" ]; then
     keep="landed but active within ${idle_days}d"

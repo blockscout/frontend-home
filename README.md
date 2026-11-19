@@ -98,8 +98,8 @@ subagent's generated name has no child prefix, so it gets the children of its pa
 
 A task worktree is retired as a whole: the child worktrees, their branches, the home worktree and its
 branch. `.claude/hooks/worktree-cleanup.sh` does it, and only for a worktree that is **proven**: nothing
-uncommitted in home or in a child, the home worktree's commit on another home branch, and every child
-branch landed. The script's header has the proofs. Anything unproven is left whole.
+uncommitted in home or in a child, the home worktree's commit on another home branch or the head of a
+merged home pull request, and every child branch landed. The script's header has the proofs. Anything unproven is left whole.
 
 - **At session start** every proven worktree that has been idle for three days is removed, and the rest
   are listed with the reason each one stays. This runs in sessions started in the main home clone, not in
