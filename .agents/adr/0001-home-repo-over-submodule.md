@@ -44,6 +44,7 @@ consumer's agent config. Every check in its results table passed. It was dropped
 - **Child skills reach a home session through committed symlinks**, because a gitignored child's skills
   are not discovered. The links are a second list to keep in step with the child, guarded by a check.
 - **A task worktree is two branches**, one in home that never gets a pull request and the task branch in
-  the child. Claude Code does not retire a hook-created worktree, so home carries its own cleanup hook.
+  the child. Claude Code looks for changes in the home worktree only before it retires one, so home
+  carries a cleanup hook that refuses the removal while a child's work has not landed.
 
 Removing the first three is tracked in blockscout/frontend-home#6.
