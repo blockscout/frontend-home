@@ -7,8 +7,8 @@ alwaysApply: false
 ---
 # Architecture decision records
 
-An ADR answers "why is it like this?" without a git archaeology session. It carries the evidence and the
-trade-off, so read the relevant one before changing what it decided.
+An ADR answers "why is it like this?" without a git archaeology session. It records a decision and the
+trade-off behind it, so read the relevant one before changing what it decided.
 
 ## Template
 
@@ -24,7 +24,29 @@ trade-off, so read the relevant one before changing what it decided.
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
+Most records are exactly that: a status and one paragraph. The value is in recording *that* a decision was
+made and *why*, not in filling out sections.
+
+The Decision stands alone: a reader who stops after it knows what was decided and why. Its sentences are of
+ordinary length. A sentence stretched to carry the evidence is a section that has not been written yet.
+
+## Optional sections
+
+Add a section only when the Decision, kept to its limit, would lose evidence a future reader needs to judge
+the decision again. There are two, in this order:
+
+| Section | Holds |
+| --- | --- |
+| `## Alternatives` | The options turned down, and what each would have cost |
+| `## Consequences` | The costs accepted with the decision |
+
+Measurements, tables and reproductions go under the section they support. A section does not restate the
+Decision, and a record has no other sections.
+
+## Plans and conditions
+
+A plan for later work goes in a tracking issue, which the record may link. A condition that would end or
+reverse the decision ("until X ships") is part of the decision and stays in the Decision.
 
 ## Where a record goes
 
