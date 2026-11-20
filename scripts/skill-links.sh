@@ -31,7 +31,7 @@ fail() {
 # The links there should be, as `<skill> <target>` lines.
 expected=''
 for child in $(printf '%s\n' "$children" | cut -d ' ' -f 1); do
-  if [ ! -d "$root/$child/.agents" ]; then
+  if [ ! -e "$root/$child/.git" ]; then
     echo "$child: not cloned here, so its skills cannot be read; run scripts/bootstrap.sh" >&2
     exit 1
   fi

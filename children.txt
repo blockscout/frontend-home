@@ -1,3 +1,4 @@
 # The children: project repositories cloned inside home, one per line as `<name> <repository URL>`.
 # The name is the directory the child is cloned into. Read through scripts/children.sh.
 frontend git@github.com:blockscout/frontend.git
+app-sdk git@github.com:blockscout/app-sdk.git
