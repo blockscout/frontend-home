@@ -18,8 +18,8 @@ package-manager commands from the active child's directory.
 "The branch" in a skill is the active child's branch. A task worktree's home branch only names the worktree
 and never identifies a task.
 
-In a task worktree, run each `git` command as its own plain call. The harness refuses a loop, a script or a
-heredoc that contains `git`.
+In a task worktree, keep each Bash call plain: one command, no loop, script or heredoc. The harness refuses a
+command it cannot verify stays inside the worktree. Write and change files with the Write and Edit tools.
 
 Work on home's own files has no active child. There a rule's paths, such as where a new record or
 `CONTEXT.md` is listed, name home's files, and commands run at the home root.
