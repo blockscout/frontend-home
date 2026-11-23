@@ -1,0 +1,13 @@
+{
+    "import": [ "./configs/cspell/base.jsonc" ],
+    // A path, so it cannot come from the base: configs/cspell/CONTEXT.md.
+    "gitignoreRoot": ".",
+    "ignorePaths": [
+        ".git",
+        "pnpm-lock.yaml"
+    ],
+    "words": [
+        "cksum",
+        "unpushed"
+    ]
+}

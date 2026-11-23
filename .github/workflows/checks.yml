@@ -21,6 +21,7 @@ jobs:
       - run: pnpm lint:children
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint:tsc
+      - run: pnpm lint:cspell --no-progress
       - run: pnpm test
       - run: pnpm test:hooks
       # The shared skills and rules name the children's files, so doc-links checks them in the children.
