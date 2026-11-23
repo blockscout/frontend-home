@@ -20,11 +20,30 @@ for file in package.json pnpm-workspace.yaml; do
   fi
 done
 
-if [[ "$TARGET" =~ ^[0-9a-f]{40}$ ]]; then
-  NEXT="$TARGET"
+TARGET_SHA="$(tr 'A-F' 'a-f' <<< "$TARGET")"
+if [[ "$TARGET_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+  NEXT="$TARGET_SHA"
 else
-  # pnpm wants the exact commit in the allowlist, so a ref is resolved here and never written.
-  NEXT="$(git ls-remote "https://github.com/$REPO.git" "$TARGET" | head -n 1 | cut -f 1)"
+  # pnpm wants the exact commit in the allowlist, so a ref is resolved here and never written. The full ref
+  # names are asked for because a bare name gives the tag object of an annotated tag, not its commit, and
+  # also matches every ref that ends in that name.
+  REFS="$(git ls-remote "https://github.com/$REPO.git" "refs/heads/$TARGET" "refs/tags/$TARGET" "refs/tags/$TARGET^{}")"
+  BRANCH=''
+  TAG=''
+  TAGGED_COMMIT=''
+  while IFS=$'\t' read -r oid ref; do
+    case "$ref" in
+      "refs/heads/$TARGET") BRANCH="$oid" ;;
+      "refs/tags/$TARGET") TAG="$oid" ;;
+      "refs/tags/$TARGET^{}") TAGGED_COMMIT="$oid" ;;
+    esac
+  done <<< "$REFS"
+  TAG="${TAGGED_COMMIT:-$TAG}"
+  if [ -n "$BRANCH" ] && [ -n "$TAG" ]; then
+    echo "bump: '$TARGET' is both a branch and a tag of $REPO; pass the commit sha instead" >&2
+    exit 1
+  fi
+  NEXT="${BRANCH:-$TAG}"
   if [ -z "$NEXT" ]; then
     echo "bump: '$TARGET' is neither a full commit sha nor a branch or tag of $REPO" >&2
     exit 1
@@ -37,15 +56,23 @@ if [ -z "$CURRENT" ]; then
   exit 1
 fi
 
+if ! grep -q "$REPO/tar.gz/$CURRENT" pnpm-workspace.yaml; then
+  echo "bump: pnpm-workspace.yaml does not allow the build of $CURRENT; the two pins have drifted" >&2
+  exit 1
+fi
+
 if [ "$CURRENT" = "$NEXT" ]; then
   echo "bump: already pinned at $NEXT"
   exit 0
 fi
 
-if ! grep -q "$REPO/tar.gz/$CURRENT" pnpm-workspace.yaml; then
-  echo "bump: pnpm-workspace.yaml does not allow the build of $CURRENT; the two pins have drifted" >&2
-  exit 1
-fi
+SNAPSHOT="$(mktemp -d)"
+trap 'rm -rf "$SNAPSHOT"' EXIT
+for file in package.json pnpm-workspace.yaml pnpm-lock.yaml; do
+  if [ -f "$file" ]; then
+    cp "$file" "$SNAPSHOT/"
+  fi
+done
 
 CURRENT="$CURRENT" NEXT="$NEXT" REPO="$REPO" node -e '
   const fs = require("node:fs");
@@ -60,4 +87,9 @@ CURRENT="$CURRENT" NEXT="$NEXT" REPO="$REPO" node -e '
 '
 
 echo "bump: $CURRENT -> $NEXT"
-pnpm install
+# Pins left moved by a failed install would make the next run answer "already pinned" and install nothing.
+if ! pnpm install; then
+  cp "$SNAPSHOT"/* .
+  echo "bump: pnpm install failed; the pin and the lockfile are back at $CURRENT" >&2
+  exit 1
+fi

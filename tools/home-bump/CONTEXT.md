@@ -6,7 +6,7 @@ commits the three files that change.
 
 ## What a consumer must keep true
 
-- **The pin is written twice, and `home-bump` is the only way to change it.** pnpm refuses a git
+- **The pin is written twice, and `home-bump` moves both entries.** pnpm refuses a git
   dependency's `prepare` script unless `allowBuilds` in `pnpm-workspace.yaml` names the package with its
   exact commit. So the commit is in `package.json` and in that key. Edit one by hand and the install stops
   with `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`.

@@ -13,20 +13,36 @@ trap 'rm -rf "$scratch"' EXIT
 OLD=1111111111111111111111111111111111111111
 NEW=2222222222222222222222222222222222222222
 MAIN=3333333333333333333333333333333333333333
+TAG_OBJECT=4444444444444444444444444444444444444444
+TAGGED=5555555555555555555555555555555555555555
+LIGHT=6666666666666666666666666666666666666666
+
+# The stub remote: an annotated tag is listed twice, as its tag object and as the commit under `^{}`.
+printf '%s\t%s\n' \
+  $MAIN refs/heads/main \
+  $NEW refs/heads/release \
+  $TAG_OBJECT refs/tags/annotated \
+  $TAGGED 'refs/tags/annotated^{}' \
+  $LIGHT refs/tags/light \
+  $MAIN refs/tags/release > "$scratch/remote-refs"
 
 mkdir "$scratch/bin"
 cat > "$scratch/bin/pnpm" <<'STUB'
 #!/bin/sh
 echo "$*" >> "$PNPM_CALLS"
+echo 'lockfile of the install' > pnpm-lock.yaml
+exit "$PNPM_STATUS"
 STUB
 cat > "$scratch/bin/git" <<'STUB'
 #!/bin/sh
 [ "$1 $2" = 'ls-remote https://github.com/blockscout/frontend-home.git' ] || exit 1
-[ "$3" = main ] && printf '%s\trefs/heads/main\n' "$MAIN_SHA"
-exit 0
+shift 2
+for ref in "$@"; do
+  awk -F '\t' -v ref="$ref" '$2 == ref' "$REMOTE_REFS"
+done
 STUB
 chmod +x "$scratch/bin/pnpm" "$scratch/bin/git"
-export PATH="$scratch/bin:$PATH" PNPM_CALLS="$scratch/pnpm-calls" MAIN_SHA=$MAIN
+export PATH="$scratch/bin:$PATH" PNPM_CALLS="$scratch/pnpm-calls" PNPM_STATUS=0 REMOTE_REFS="$scratch/remote-refs"
 
 failures=0
 current=''
@@ -51,8 +67,10 @@ assert_contains() {
 setup() {
   current=$1
   package="$scratch/package"
+  PNPM_STATUS=0
   rm -rf "$package" "$PNPM_CALLS"
   mkdir "$package"
+  echo 'lockfile of the current pin' > "$package/pnpm-lock.yaml"
   cat > "$package/package.json" <<JSON
 {
   "devDependencies": {
@@ -106,6 +124,24 @@ run
 assert_eq "$status" 0 'exit status'
 assert_eq "$(pin_in_package)" $MAIN 'package.json'
 
+setup 'an annotated tag is resolved to the commit it points at, not to the tag object' $OLD $OLD
+run annotated
+assert_eq "$status" 0 'exit status'
+assert_eq "$(pin_in_package)" $TAGGED 'package.json'
+assert_eq "$(pin_in_workspace)" $TAGGED 'pnpm-workspace.yaml'
+
+setup 'a lightweight tag is resolved to its commit' $OLD $OLD
+run light
+assert_eq "$status" 0 'exit status'
+assert_eq "$(pin_in_package)" $LIGHT 'package.json'
+
+setup 'a name that is both a branch and a tag stops before anything is written' $OLD $OLD
+run release
+assert_eq "$status" 1 'exit status'
+assert_contains "$out" 'both a branch and a tag' 'message'
+assert_eq "$(pin_in_package)" $OLD 'package.json'
+assert_eq "$(pnpm_calls)" '' 'pnpm calls'
+
 setup 'an unknown ref stops before anything is written' $OLD $OLD
 run no-such-branch
 assert_eq "$status" 1 'exit status'
@@ -126,6 +162,23 @@ assert_contains "$out" 'the two pins have drifted' 'message'
 assert_eq "$(pin_in_package)" $OLD 'package.json'
 assert_eq "$(pin_in_workspace)" $MAIN 'pnpm-workspace.yaml'
 assert_eq "$(pnpm_calls)" '' 'pnpm calls'
+
+setup 'pins that have drifted stop the run when package.json already names the target' $NEW $OLD
+run $NEW
+assert_eq "$status" 1 'exit status'
+assert_contains "$out" 'the two pins have drifted' 'message'
+assert_eq "$(pin_in_workspace)" $OLD 'pnpm-workspace.yaml'
+assert_eq "$(pnpm_calls)" '' 'pnpm calls'
+
+setup 'a failed install puts both pins and the lockfile back' $OLD $OLD
+PNPM_STATUS=1
+run $NEW
+assert_eq "$status" 1 'exit status'
+assert_contains "$out" 'pnpm install failed' 'message'
+assert_eq "$(pin_in_package)" $OLD 'package.json'
+assert_eq "$(pin_in_workspace)" $OLD 'pnpm-workspace.yaml'
+assert_eq "$(cat "$package/pnpm-lock.yaml")" 'lockfile of the current pin' 'pnpm-lock.yaml'
+assert_eq "$(pnpm_calls)" install 'pnpm calls'
 
 setup 'a package without the home dependency is refused' $OLD $OLD
 printf '{ "devDependencies": {} }\n' > "$package/package.json"
