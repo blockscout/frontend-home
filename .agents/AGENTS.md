@@ -36,6 +36,7 @@ A skill that is a symlink in `.agents/skills/` is a child's skill: see
 ## Per-directory context
 
 - `tools/doc-links/` — the doc-link checker.
+- `tools/home-bump/` — a consumer's pin of home, and the command that moves it.
 
 ## Architecture decision records (ADRs)
 

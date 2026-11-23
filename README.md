@@ -14,7 +14,7 @@ The children are `frontend` and `app-sdk`, and the layout may still change.
 | `.claude/agents/` | Claude Code subagent definitions, which only Claude Code reads |
 | `children.txt` | The children, by name and repository URL |
 | `scripts/` | Cloning the children, the check that the ignore files list them, and the links to their skills |
-| `tools/` | Developer tools a child installs from home as a pinned git dependency ([`tools/doc-links/CONTEXT.md`](tools/doc-links/CONTEXT.md)) |
+| `tools/` | Developer tools a child installs from home as a pinned git dependency ([`tools/doc-links/CONTEXT.md`](tools/doc-links/CONTEXT.md)), and the command that moves the pin ([`tools/home-bump/CONTEXT.md`](tools/home-bump/CONTEXT.md)) |
 
 ## Setup
 

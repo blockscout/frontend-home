@@ -23,6 +23,7 @@ jobs:
       - run: pnpm lint:tsc
       - run: pnpm test
       - run: pnpm test:hooks
+      - run: pnpm test:bump
       # The shared skills and rules name the children's files, so doc-links checks them in the children.
       # The skill links are compared with the skills each child has on its main branch.
       - name: Clone the children
