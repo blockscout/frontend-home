@@ -58,8 +58,8 @@ the child's settings only, so it still loads the frozen rule.
 
 A **local rule** holds what one child adds to a home rule or does differently: its commands, its file
 names, its exceptions. For home rule `<name>` it is the child's `.agents/rules/<name>-local.md`, with the
-same `paths` and `globs`. Both load on a matching read, in a home session and in a session started inside
-the child.
+same `paths` and `globs`. On a matching read a home session loads the home rule and the local rule. A
+session started inside the child loads the local rule and the child's frozen rule, never the home rule.
 
 - **The home rule names the local rule in its opening lines**, and says the child's rule wins where the two
   disagree. A home rule names no other file of a child.
