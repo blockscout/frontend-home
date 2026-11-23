@@ -18,6 +18,8 @@ export interface RepoIndex {
   // A shared skill or rule in home names a child's file by its path from the child's root, so a
   // root-relative path may resolve in a child as well.
   readonly childRoots: ReadonlyArray<string>;
+  // Each child as a repository of its own, for the documents that live in it.
+  readonly children: ReadonlyArray<RepoIndex>;
 }
 
 const topLevelOf = (tracked: ReadonlyArray<string>): Array<string> =>
@@ -29,7 +31,16 @@ export function buildRepoIndex(root: string, tracked: ReadonlyArray<string>, chi
     tracked,
     topLevel: new Set([ tracked, ...children.map((child) => child.tracked) ].flatMap(topLevelOf)),
     childRoots: children.map((child) => child.root),
+    children: children.map((child) => buildRepoIndex(child.root, child.tracked)),
   };
+}
+
+// A child's document reaches the repository through a symlink, as a child's skill does. It is the child's
+// own: its paths name the child's files, never the repository's, so it is judged as the child's own run
+// judges it. Against the whole index a directory only the repository has would turn the child's prose into
+// a reference.
+export function indexFor(repo: RepoIndex, realPath: string): RepoIndex {
+  return repo.children.find((child) => realPath.startsWith(child.root + path.sep)) ?? repo;
 }
 
 export const isPlaceholder = (target: string): boolean => /[<>{}*]|__/.test(target);

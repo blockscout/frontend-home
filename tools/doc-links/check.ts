@@ -2,7 +2,7 @@ import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 
 import type { RepoIndex } from './resolve';
-import { headingSlugs, isPlaceholder, nearby, resolves, shorthandFor } from './resolve';
+import { headingSlugs, indexFor, isPlaceholder, nearby, resolves, shorthandFor } from './resolve';
 import { withoutFences, withoutIllustrations } from './strip';
 
 const PATH_EXTENSIONS = /\.(?:md|mdc|mjs|json|jsonc|ya?ml|sh|tsx?)$/;
@@ -71,7 +71,8 @@ async function checkLine(ctx: LineContext, rawLine: string): Promise<Array<strin
 
 export async function checkFile(repo: RepoIndex, fileRel: string): Promise<Array<Finding>> {
   const absPath = path.join(repo.root, fileRel);
-  const ctx: LineContext = { repo, realDir: path.dirname(await realpath(absPath)) };
+  const realPath = await realpath(absPath);
+  const ctx: LineContext = { repo: indexFor(repo, realPath), realDir: path.dirname(realPath) };
   const lines = withoutFences(await readFile(absPath, 'utf8'));
 
   const findings: Array<Finding> = [];

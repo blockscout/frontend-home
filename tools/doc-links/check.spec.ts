@@ -101,6 +101,25 @@ describe('a child cloned inside the repository', () => {
   it('reports a path into the child that resolves nowhere', async() => {
     expect(await messagesFor('See `docs/GONE.md`.')).toEqual([ 'path reference does not exist: docs/GONE.md' ]);
   });
+
+  describe('a document that lives in the child and is symlinked into the repository', () => {
+    const SKILL = '.agents/skills/deploy/SKILL.md';
+
+    async function messagesForChildDoc(line: string): Promise<Array<string>> {
+      write(`frontend/${ SKILL }`, line);
+      fs.mkdirSync(path.join(root, '.agents/skills'), { recursive: true });
+      fs.symlinkSync(path.join(root, 'frontend/.agents/skills/deploy'), path.join(root, '.agents/skills/deploy'));
+      return (await checkFile(repo, SKILL)).map((finding) => finding.message);
+    }
+
+    it('is not held to a directory that only the repository has', async() => {
+      expect(await messagesForChildDoc('The configs repository keeps them in `src/widgets/`.')).toEqual([]);
+    });
+
+    it('is still held to the child\'s own directories', async() => {
+      expect(await messagesForChildDoc('See `docs/GONE.md`.')).toEqual([ 'path reference does not exist: docs/GONE.md' ]);
+    });
+  });
 });
 
 describe('what is not a reference', () => {
