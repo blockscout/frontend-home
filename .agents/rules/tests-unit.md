@@ -8,8 +8,8 @@ alwaysApply: false
 # Unit tests
 
 This rule holds what is true of a unit test in any repository. The runner, its commands, the helpers and
-the naming conventions belong to the active child and are documented there; the child's own unit-test rule
-says where.
+the naming conventions belong to the active child and are documented there; the child's instructions say
+where.
 
 ## Purpose
 
