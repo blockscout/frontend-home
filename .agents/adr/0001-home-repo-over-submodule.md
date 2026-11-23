@@ -38,7 +38,8 @@ consumer's agent config. Every check in its results table passed. It was dropped
   there. A home change reaches a session started in `frontend` only when copied over by hand, and until
   then the two disagree.
 - **The double rule load.** In a home session a frozen rule in the child loads alongside its home
-  original on a matching read.
+  original on a matching read. Lifted for Claude Code: home's project settings skip each frozen rule
+  through `claudeMdExcludes`. Cursor has no such setting and still loads both.
 - **Duplicated settings.** `frontend` keeps its own project settings and hooks, and home has adapted
   copies of the same hooks. A fix in one has to be made in the other.
 - **Child skills reach a home session through committed symlinks**, because a gitignored child's skills

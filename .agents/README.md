@@ -36,6 +36,24 @@ Keep `paths` and `globs` in step by hand. Nothing warns when they drift.
 - **A rule with no `paths` loads at launch, in every session.** A document meant to be read on demand sits
   outside `rules/`, with a pointer to it from `AGENTS.md` or a skill.
 
+## Frozen rules in a child
+
+A **frozen rule** is a rule that moved to home and is still in the child, for sessions started inside the
+child. In a home session the frozen rule and its home original match the same files, so both would load.
+Home's `.claude/settings.json` skips each frozen rule with one `claudeMdExcludes` entry:
+
+```json
+"claudeMdExcludes": [ "**/<child>/.agents/rules/<name>.md" ]
+```
+
+The `**/` prefix covers the main clone and every task worktree. A session started inside the child reads
+the child's settings only, so it still loads the frozen rule.
+
+- **Keep the entries in step with the children by hand.** Nothing checks them. When a child freezes a
+  rule, add its entry. When a frozen rule is removed or becomes the child's own again, delete its entry.
+- **A stale entry hides a rule.** A child rule under an excluded name never loads in a home session.
+- **Cursor ignores the setting**, so a frozen rule loads twice there.
+
 ## Child skills
 
 A session started in home has a child's skills only through the committed symlinks in `skills/`. Each is named
