@@ -1,8 +1,10 @@
 {
   "claudeMdExcludes": [
     "**/frontend/.agents/rules/adr.md",
+    "**/frontend/.agents/rules/code-quality.md",
     "**/frontend/.agents/rules/docs.md",
-    "**/frontend/.agents/rules/tests-unit.md"
+    "**/frontend/.agents/rules/tests-unit.md",
+    "**/frontend/.agents/rules/typescript.md"
   ],
   "hooks": {
     "SessionStart": [

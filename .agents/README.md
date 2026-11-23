@@ -54,6 +54,20 @@ the child's settings only, so it still loads the frozen rule.
 - **A stale entry hides a rule.** A child rule under an excluded name never loads in a home session.
 - **Cursor ignores the setting**, so a frozen rule loads twice there.
 
+## Local rules in a child
+
+A **local rule** holds what one child adds to a home rule or does differently: its commands, its file
+names, its exceptions. For home rule `<name>` it is the child's `.agents/rules/<name>-local.md`, with the
+same `paths` and `globs`. On a matching read a home session loads the home rule and the local rule. A
+session started inside the child loads the local rule and the child's frozen rule, never the home rule.
+
+- **The home rule names the local rule in its opening lines**, and says the child's rule wins where the two
+  disagree. A home rule names no other file of a child.
+- **A local rule is the child's own.** Edit it in the child. It is never frozen and gets no
+  `claudeMdExcludes` entry.
+- **A frozen rule cannot carry local content.** The exclusion hides the whole file from a home session, so
+  what is local sits in the local rule, never in the frozen copy.
+
 ## Child skills
 
 A session started in home has a child's skills only through the committed symlinks in `skills/`. Each is named
