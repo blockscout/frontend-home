@@ -8,9 +8,11 @@
     "pnpm": ">=9.0.0"
   },
   "bin": {
-    "doc-links": "tools/doc-links/dist/index.js"
+    "doc-links": "tools/doc-links/dist/index.js",
+    "home-bump": "tools/home-bump/bump.sh"
   },
   "files": [
+    "tools/home-bump/bump.sh",
     "tools/*/dist",
     "configs"
   ],
@@ -22,6 +24,7 @@
     "lint:children": "./scripts/check-children.sh",
     "lint:skill-links": "./scripts/skill-links.sh --check",
     "test": "vitest run --dir tools",
+    "test:bump": "./tools/home-bump/bump.test.sh",
     "test:hooks": "./.claude/hooks/tests/worktree-create.test.sh && ./.claude/hooks/tests/worktree-cleanup.test.sh"
   },
   "devDependencies": {

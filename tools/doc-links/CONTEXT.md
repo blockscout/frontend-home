@@ -31,9 +31,7 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
   and the consumer gets a command with no file behind it.
 - **Home keeps `pnpm-lock.yaml` and no other lockfile.** pnpm builds a git dependency with the package
   manager its lockfile names, so a `package-lock.json` here makes the consumer's install run npm.
-- **A consumer allows the build by exact commit.** pnpm refuses a git dependency's `prepare` script unless
-  `allowBuilds` in the consumer's `pnpm-workspace.yaml` has the package with its commit; a name-only key is
-  rejected. Changing the pin is therefore two edits.
+- **How a consumer pins home, and how the pin moves**, is in `tools/home-bump/CONTEXT.md`.
 - **Every path this directory's own docs write is checked by the tool they document.** A rename here that
   misses `CONTEXT.md` fails the run.
 
