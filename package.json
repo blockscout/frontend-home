@@ -8,8 +8,16 @@
     "pnpm": ">=9.0.0"
   },
   "bin": {
+    "code-complexity": "tools/code-complexity/dist/code-complexity/index.js",
     "doc-links": "tools/doc-links/dist/index.js",
     "home-bump": "tools/home-bump/bump.sh"
+  },
+  "exports": {
+    "./code-complexity": {
+      "types": "./tools/code-complexity/dist/code-complexity/lib.d.ts",
+      "default": "./tools/code-complexity/dist/code-complexity/lib.js"
+    },
+    "./configs/*": "./configs/*"
   },
   "files": [
     "tools/home-bump/bump.sh",
@@ -17,7 +25,7 @@
     "configs"
   ],
   "scripts": {
-    "prepare": "tsc -p tools/doc-links/tsconfig.json",
+    "prepare": "tsc -p tools/doc-links/tsconfig.json && tsc -p tools/code-complexity/tsconfig.json",
     "lint:tsc": "tsc -p tsconfig.json",
     "lint:cspell": "cspell .",
     "lint:doc-links": "./scripts/doc-links.sh",
@@ -26,6 +34,9 @@
     "test": "vitest run --dir tools",
     "test:bump": "./tools/home-bump/bump.test.sh",
     "test:hooks": "./.claude/hooks/tests/worktree-create.test.sh && ./.claude/hooks/tests/worktree-cleanup.test.sh"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.7"
   },
   "devDependencies": {
     "@types/node": "24.13.4",
