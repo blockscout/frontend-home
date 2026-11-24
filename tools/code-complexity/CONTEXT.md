@@ -22,7 +22,7 @@ at its root.
 | Which files and functions get gated at all? | `./docs/MODEL.md` |
 | How do I run it? What feeds the coverage half? | `pnpm test:code-complexity --help`, then `./docs/RUNNING.md` |
 | What goes in the config file? | `./docs/RUNNING.md` |
-| Can I move a cap? | short answer: no. The consumer's calibration record, where it keeps one |
+| Can I move a cap? How do I set them for a new consumer? | short answer to the first: no. `./docs/CALIBRATION.md` |
 | Why is the counting model like this? | `./adr/` |
 | Why one home package for every tool? | `.agents/adr/0002-one-home-package-for-every-tool.md` |
 | Which file implements what? | the file map at the bottom |
