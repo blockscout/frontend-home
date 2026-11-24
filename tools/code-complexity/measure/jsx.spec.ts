@@ -34,4 +34,8 @@ describe('fileContainsJsx', () => {
     // `<T>` here is a type parameter, not JSX; a .ts file never parses JSX.
     expect(fileContainsJsx('const f = <T,>(x: T): T => x;', 'f.ts')).toBe(false);
   });
+
+  it.each([ 'C.jsx', 'C.js', 'C.mjs', 'C.cjs' ])('detects JSX in a JavaScript file (%s)', (fileName) => {
+    expect(fileContainsJsx('const C = () => <div>hi</div>;', fileName)).toBe(true);
+  });
 });

@@ -2,10 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | accepted |
-| Date | 2026-08-27 |
-| Deciders | @tom2drum |
-| Supersedes | — |
+| Status | Accepted |
 
 ## Decision
 
@@ -15,9 +12,12 @@ rule (`if`/`else if`, loops, `case`, `catch`, ternary, `&&`/`||`/`??`); `?.` is 
 deliberate divergence.
 
 The textbook cyclomatic definition, and ESLint's rule, treat each `?.` as a branch because it
-short-circuits. This gate does not.
+short-circuits. This gate does not: the count feeds CRAP as the number of paths a test must cover,
+and a `?.` is not one.
 
-## Why
+## Alternatives
+
+**Count `?.` as a branch, as ESLint's `complexity` rule does.** Turned down for three reasons.
 
 **A `?.` is not a path a test must cover.** Cyclomatic complexity is only useful here as a proxy
 for the number of independent paths through a function — roughly, the test cases needed to exercise

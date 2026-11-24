@@ -115,10 +115,9 @@ bug. Labelled `break`/`continue` is exact (purely syntactic).
 
 ### `?.` and `??` are not counted
 
-Optional chaining is excluded per ADR 0001 — CC's model does not treat it as a branch or a nesting
-structure, so the exclusion carries over for free. Null-coalescing (`??`, `??=`) is excluded because
-the SonarSource white paper itself ignores it as readable shorthand, in the same class as `?.`
-(ADR 0002). Cyclomatic complexity still counts `??` — the two scores diverge here on purpose.
+Neither adds to CC. Why: `../adr/0001-optional-chaining-excluded-from-complexity.md` for `?.`, and
+`../adr/0002-quadratic-nesting-and-null-coalescing-in-cognitive-complexity.md` for `??` and `??=`.
+Cyclomatic complexity still counts `??` — the two scores diverge here on purpose.
 
 ### Per-function units, and the nesting reset
 

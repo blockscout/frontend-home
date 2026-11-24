@@ -2,10 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | accepted |
-| Date | 2026-08-31 |
-| Deciders | @tom2drum |
-| Supersedes | — |
+| Status | Accepted |
 
 ## Decision
 
@@ -22,9 +19,13 @@ in two coupled ways:
 The two are one decision: the caps in a consumer's `code-complexity.config.json` are
 calibrated against this exact model.
 
-## Why
+## Alternatives
 
-**The gate's thesis is "forgive breadth, punish nesting" — the linear model cannot express it.**
+Three parts of the SonarSource model were turned down: its linear nesting, counting `??`, and its
+flattening of ternary chains.
+
+**Linear nesting: the gate's thesis is "forgive breadth, punish nesting", and the linear model cannot
+express it.**
 The SonarSource white paper counts breadth: every `if`/ternary/loop/`catch` is `+1` whether flat or
 not, with nesting layered on as an *additional* per-level increment. Under that model the repo's
 worst flat-breadth hooks scored 18 while its deep-nested `switch`-tree hook — the example the parent
@@ -32,7 +33,7 @@ spec named as a required trip — scored 15. They **overlap**, so no cap separat
 to catch the nesting also catches the breadth. That was the false-positive problem the first-pass
 caps shipped with.
 
-**Quadratic nesting is a surgical surcharge on the deep tail.** Consecutive differences are the odd
+**Against it, quadratic nesting is a surgical surcharge on the deep tail.** Consecutive differences are the odd
 numbers (1, 3, 5, …): each level costs 2 more than the last. It is *identical* to linear at depths 0
 and 1 and diverges only from the third level in, so flat and shallow code — the bulk of the
 distribution, whose percentiles do not move — is untouched while genuinely-nested code accelerates
@@ -40,7 +41,7 @@ away. That separation is what a single cap needs. On the full repo it lifts 7 of
 firing at the recalibrated behavior cap of 20, including the nested anchor above (15 → 23, tripping
 with margin), while leaving the flat-breadth band below the cap.
 
-**`??` was a spec-conformance bug, not a divergence.** The SonarSource paper explicitly ignores
+**Counting `??` was a spec-conformance bug, not a divergence.** The SonarSource paper explicitly ignores
 null-coalescing as readable shorthand, in the same class as `?.`. Counting it measured defaulting
 verbosity: at calibration the worst case was an API-model mapper — a flat wall of `x ?? null` field
 assignments with no control flow — scoring 14, as much as genuinely branchy logic. Dropping it takes
@@ -59,8 +60,8 @@ priced as such.
   `eslint-plugin-sonarjs` will show us reading higher on anything nested past depth 1. That is by
   design; oracle parity is not a regression test. The counting conventions and the full list of
   divergences live in `../docs/MODEL.md`.
-- **The model and the caps are one decision.** `DEFAULT_MAX_COGNITIVE_BEHAVIOR` / `_JSX` were set
-  from the full-repo distribution *under this model*. Reverting either change — re-counting `??`, or
+- **The model and the caps are one decision.** The cognitive caps in a consumer's
+  `code-complexity.config.json` were set from its full-repo distribution *under this model*. Reverting either change — re-counting `??`, or
   going back to linear nesting — silently makes the caps wrong (far looser, since scores collapse),
   so a change to the increment model demands a fresh full-repo recalibration in the same PR.
 - The behavior cap sits at a natural gap in the resulting distribution rather than being pinned to

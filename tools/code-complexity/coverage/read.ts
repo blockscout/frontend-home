@@ -36,20 +36,38 @@ function buildLineHits(fileCoverage: IstanbulFileCoverage): Map<number, number> 
   return lineHits;
 }
 
+function withForwardSlashes(filePath: string): string {
+  return filePath.replace(/\\/g, '/');
+}
+
+// The working directory as a path prefix, in both spellings: the report holds real paths, and the
+// working directory may have been reached through a symlink.
+function workingDirectoryPrefixes(): Array<string> {
+  const cwd = process.cwd();
+  return [ ...new Set([ cwd, fs.realpathSync(cwd) ]) ].map((directory) => `${ withForwardSlashes(directory) }/`);
+}
+
 export function parseCoverage(jsonText: string): CoverageData {
   const raw = JSON.parse(jsonText) as CoverageJson;
 
-  // The report keys files by absolute path; the gate looks them up by repo-relative path, so match
-  // on a path suffix (`.../src/foo.ts` ends with `src/foo.ts`). Line maps are built once up front.
+  // The report keys files by absolute path; the gate looks them up by repo-relative path. Line maps
+  // are built once up front.
   const entries = Object.entries(raw).map(([ key, fileCoverage ]) => ({
-    path: (fileCoverage.path ?? key).replace(/\\/g, '/'),
+    path: withForwardSlashes(fileCoverage.path ?? key),
     lineHits: buildLineHits(fileCoverage),
   }));
 
+  // A report made in the working directory is matched on the whole path. A path suffix is left for a
+  // report made under another root, where it is the only match there is: `src/util.ts` is also the
+  // suffix of `lib/src/util.ts`, and the first of the two in the report would win.
+  const root = workingDirectoryPrefixes().find((prefix) => entries.some((entry) => entry.path.startsWith(prefix)));
+
   return {
     lineHitsFor(relativePath: string): LineHits | undefined {
-      const relative = relativePath.replace(/\\/g, '/');
-      const match = entries.find((entry) => entry.path === relative || entry.path.endsWith(`/${ relative }`));
+      const relative = withForwardSlashes(relativePath);
+      const match = root === undefined ?
+        entries.find((entry) => entry.path === relative || entry.path.endsWith(`/${ relative }`)) :
+        entries.find((entry) => entry.path === relative || entry.path === `${ root }${ relative }`);
       return match?.lineHits;
     },
   };

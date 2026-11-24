@@ -31,8 +31,6 @@ export interface FunctionComplexity {
   containsJsx: boolean;
 }
 
-// JSX node kinds that mark a function as directly containing JSX. Exported so ./jsx.ts (the
-// file-level detector) shares one definition rather than keeping a parallel copy.
 export const JSX_KINDS: ReadonlySet<ts.SyntaxKind> = new Set([
   ts.SyntaxKind.JsxElement,
   ts.SyntaxKind.JsxSelfClosingElement,
@@ -162,8 +160,18 @@ function selfCallName(node: ts.Node): string | undefined {
   return undefined;
 }
 
+const SCRIPT_KIND_BY_EXTENSION: ReadonlyArray<readonly [ extension: string, kind: ts.ScriptKind ]> = [
+  [ '.tsx', ts.ScriptKind.TSX ],
+  [ '.jsx', ts.ScriptKind.JSX ],
+  [ '.js', ts.ScriptKind.JS ],
+  [ '.mjs', ts.ScriptKind.JS ],
+  [ '.cjs', ts.ScriptKind.JS ],
+];
+
+// A JavaScript file is parsed as JavaScript: read as TypeScript, its JSX is a run of `<` comparisons.
 export function scriptKind(fileName: string): ts.ScriptKind {
-  return fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const known = SCRIPT_KIND_BY_EXTENSION.find(([ extension ]) => fileName.endsWith(extension));
+  return known === undefined ? ts.ScriptKind.TS : known[1];
 }
 
 interface Frame {

@@ -350,6 +350,11 @@ describe('computeFunctionComplexities — jsx/behavior classification (containsJ
     expect(jsxByName('const C = () => <div><span/></div>;')).toEqual({ C: true });
   });
 
+  it('reads the JSX of a JavaScript file as JSX, not as comparisons', () => {
+    const [ component ] = computeFunctionComplexities('const C = (props) => <div>{ props.a ? <b/> : null }</div>;', 'C.js');
+    expect(component).toMatchObject({ name: 'C', containsJsx: true, complexity: 2 });
+  });
+
   it('marks an inline `.map(x => <Row/>)` callback jsx, and the component too', () => {
     // Both directly contain JSX in their own bodies: the component holds <ul>, the callback holds <li>.
     expect(jsxByName(`

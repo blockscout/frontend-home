@@ -50,7 +50,8 @@ level is where the points are and pulling it out is almost always the cheapest w
 
 **`CRAP` — add a test.** CRAP joins cyclomatic complexity with coverage, and coverage is the only
 lever. Simplifying the function lowers its *cognitive* score, not its CRAP. A `behavior` function
-with no co-located spec reads 0%, accurately — no unit test exercises it.
+that no spec executes reads 0%. When a missing report entry reads `—` instead, and where the score
+of a function in a spec-less JSX file depends on the selection: `./docs/RUNNING.md`.
 
 **Raising the cap is not the fix.** The caps are coupled to each other and to the counting model, so a
 consumer moves one only by recalibrating all of them.

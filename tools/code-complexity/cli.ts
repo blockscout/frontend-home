@@ -184,7 +184,7 @@ function runFocusedMode(run: Run): Array<ReportRow> {
 // whole suite regardless.
 function runFullMode(run: Run): Array<ReportRow> {
   const { options } = run;
-  const files = getAllSourceFiles(process.cwd(), run.isInScope);
+  const files = getAllSourceFiles(process.cwd(), run.isInScope).filter((file) => fs.existsSync(file));
   if (files.length === 0) return [];
   const coverage = resolveCoverage(run, { mode: 'full' }, true);
 

@@ -8,10 +8,6 @@ import { readCoverageOrEmpty } from './read';
 
 // Output goes to a throwaway temp dir (never the user's ./coverage) and is removed once read.
 
-// Node caps a child process's captured stdout at 1MB by default; a large diff or coverage report
-// overruns that and throws.
-const EXEC_MAX_BUFFER = 64 * 1024 * 1024;
-
 const VITEST_BIN = path.join('node_modules', '.bin', 'vitest');
 const COVERAGE_FILE = 'coverage-final.json';
 
@@ -56,7 +52,6 @@ function runVitestCoverage(reportsDirectory: string, request: CoverageRequest, o
     // streams it live (`inherit`) for debugging a slow or failing run.
     execFileSync(VITEST_BIN, args, {
       stdio: options.verbose ? 'inherit' : [ 'ignore', 'ignore', 'ignore' ],
-      maxBuffer: EXEC_MAX_BUFFER,
     });
   } catch {
     // A non-zero vitest exit (a failing test) must not sink the whole gate: vitest still writes

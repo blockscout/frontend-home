@@ -32,6 +32,13 @@ describe('parseCoverage + lineHitsFor', () => {
     expect(data.lineHitsFor('src/lib/bar.ts')).toBeUndefined();
   });
 
+  it('matches a report made in the working directory on the whole path, not on a shared suffix', () => {
+    const nested = path.join(process.cwd(), 'lib', 'src', 'util.ts');
+    const data = parseCoverage(reportFor(nested, { '1': 7 }));
+    expect(data.lineHitsFor('src/util.ts')).toBeUndefined();
+    expect(data.lineHitsFor('lib/src/util.ts')?.get(1)).toBe(7);
+  });
+
   it('takes the highest count among statements sharing a line', () => {
     const raw = JSON.stringify({
       '/x/src/f.ts': {

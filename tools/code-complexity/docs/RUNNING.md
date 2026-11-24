@@ -64,20 +64,24 @@ Separately from per-function scoring, a *file* needs vitest coverage generated f
 **JSX-less logic file** *or* a **JSX file with a co-located vitest spec** (`Component.spec.tsx` or `Component.isolated.spec.tsx` next
 to `Component.tsx`; a browser test such as `Component.pw.tsx` does not count). This only decides whether
 `vitest related`/`--changed` pulls the file in. A `behavior` function in a JSX file outside that set
-is absent from the report and scores 0% without triggering a run.
+triggers no run, and scores from whatever the report holds: 0% when the file is absent from it.
 
-Four consequences:
+Five consequences:
 
-- **Vitest is skipped when nothing needs coverage.** Only files in the generation scope cause a run,
-  so a focused run on a spec-less JSX component returns instantly — scoring its `behavior` functions
-  0%, exactly as it would have had the run happened. Skipping the run is not `--no-coverage`:
-  generation scope never decides which functions are scored, so a function's score never depends on
-  what else shared its selection. A diff with nothing in scope prints "No functions to check." and
-  runs nothing.
+- **Vitest is skipped when nothing in the selection needs coverage.** Only files in the generation
+  scope cause a run, so a focused run on a spec-less JSX component returns instantly and scores its
+  `behavior` functions 0%. Skipping the run is not `--no-coverage`: generation scope never decides
+  which functions are scored. A diff with nothing in scope prints "No functions to check." and runs
+  nothing.
+- **The skip is an approximation, and the score of a `behavior` function in a spec-less JSX file
+  depends on its selection.** A spec that is not co-located may still execute the file. Its hits
+  count whenever a report holds them: when another file of the selection triggers the run, in a
+  full run, and with `--coverage-file`. Alone in its selection the same function scores 0%. Tracked
+  in blockscout/frontend-home#29.
 - **All three generated scopes select through the module graph** (`vitest related <paths>`,
-  `vitest run --changed <merge-base>`, or the whole suite), so a file's coverage is the same however
-  it was reached. A selection with no matching specs passes; a failing suite warns and still reports
-  whatever coverage landed.
+  `vitest run --changed <merge-base>`, or the whole suite), so the coverage of a file in the
+  generation scope is the same however it was reached. A selection with no matching specs passes; a
+  failing suite warns and still reports whatever coverage landed.
 - **A spec that costs much and covers little is excluded in the consumer's coverage vitest config**, the
   one `coverage.vitestConfig` names. A module-graph selection otherwise pulls it in for almost any file.
 - **A function absent from the coverage report usually scores 0%, not `—`.** The one exception is a

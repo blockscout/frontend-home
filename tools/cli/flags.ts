@@ -22,8 +22,6 @@ export interface ParsedArgs<Options> {
   readonly rest: Array<string>;
 }
 
-// Split a token into its flag name and inline value: `--flag=value` splits at the first `=`, a bare
-// `--flag` has no inline value.
 function splitFlag(arg: string): { readonly name: string; readonly inline: string | undefined } {
   const equals = arg.indexOf('=');
   if (equals === -1) return { name: arg, inline: undefined };
