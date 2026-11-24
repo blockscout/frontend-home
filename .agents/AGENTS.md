@@ -49,6 +49,8 @@ See `./rules/adr.md` when proposing or adding a new record.
   each consumer, and the costs accepted for phase 1.
 - `adr/0002-one-home-package-for-every-tool.md` — why every command and library export ships in the one
   `frontend-home` package, who supplies a runtime dependency, and the build budget.
+- `adr/0003-type-fest-over-a-home-types-export.md` — why the shared generic type utilities come from
+  `type-fest` and home exports no types.
 
 ## Editing this instruction set
 
