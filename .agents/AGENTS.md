@@ -36,6 +36,8 @@ A skill that is a symlink in `.agents/skills/` is a child's skill: see
 ## Per-directory context
 
 - `tools/doc-links/` — the doc-link checker.
+- `tools/code-complexity/` — the Cognitive Complexity and CRAP gate: what a failure means, the consumer's
+  config file, and what the engine must not hold.
 - `tools/home-bump/` — a consumer's pin of home, and the command that moves it.
 - `configs/cspell/` — the cspell base config the children import, and which word list a word goes in.
 
@@ -45,6 +47,8 @@ See `./rules/adr.md` when proposing or adding a new record.
 
 - `adr/0001-home-repo-over-submodule.md` — why the shared agent setup is a home repo and not a submodule in
   each consumer, and the costs accepted for phase 1.
+- `adr/0002-one-home-package-for-every-tool.md` — why every command and library export ships in the one
+  `frontend-home` package, who supplies a runtime dependency, and the build budget.
 
 ## Editing this instruction set
 

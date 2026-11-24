@@ -25,8 +25,6 @@ home as a pnpm git dependency pinned by commit, and wires the command to a packa
   contradicts the tool.
 - **The repo root comes from git, asked from the working directory.** The entry file's own location is
   inside the consumer's `node_modules`, where git answers with nothing useful.
-- **No runtime dependencies.** A consumer gets the built files and nothing else. This is a phase-1
-  limit: delivering a tool that needs a package at run time is tracked in blockscout/frontend-home#6.
 - **`files` in home's `package.json` is what ships `dist`.** Without it the pack step follows `.gitignore`
   and the consumer gets a command with no file behind it.
 - **Home keeps `pnpm-lock.yaml` and no other lockfile.** pnpm builds a git dependency with the package
