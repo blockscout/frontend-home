@@ -1,7 +1,8 @@
 # Smell baseline
 
 Thirteen code smells the Standards axis carries on top of whatever `.agents/rules/` documents. Each reads
-*what it is* → *how to fix*; match them against the diff.
+*what it is* → *how to fix*; match them against the diff. What the child adds to a smell is in its
+`.agents/skills/review-changes/smells-local.md`, when it has one, under the smell's name.
 
 Three rules bind the baseline:
 
@@ -32,7 +33,7 @@ usually arrive together) — pick the sharper one and drop the rest, or the repo
   → delete it; inline back until a real need shows. *The highest-yield smell in agent-written code.*
 - **Middle Man** — a component or hook that only forwards to another. → cut it, call the real target.
 - **Feature Envy** — a module that mostly manipulates another area's data or internals. → move it to the
-  data it envies; see `src/slices/CONTEXT.md` on slice ownership.
+  data it envies.
 - **God Component** — one component fetching, shaping, rendering *and* laying out. → extract a hook, or
   split container from presentation.
 - **Effect Escape Hatch** — `useEffect` doing what derived state, an event handler, or a react-query

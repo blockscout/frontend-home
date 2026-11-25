@@ -35,23 +35,12 @@ The gates' own docs name the same line for their domain: the mutation-testing do
 reason to restructure working code", the complexity doc's "raising the cap is not the fix". When the only
 fix you can see crosses it, the question goes to the developer.
 
-## 3. Playwright screenshot mismatches
+## 3. The child's own gates
 
-Every other Playwright failure — an unmocked request, a timeout, an assertion on text or a role, a failed
-mount — is a plain fix under the escape above. A **screenshot mismatch** has a baseline question:
-
-1. **Reproduce in Docker**, the only run whose pixels match CI (`.agents/rules/tests-visual.md` has the
-   command), and **view the diff image** — the expected, actual and diff files sit together, and the
-   `Read` tool renders images.
-2. **Decide what the diff is.** Match the changed region to the PR's diff and to the task spec's
-   Functional Requirements (`.agents/tasks/<issue>-<slug>/spec.md`; on a non-task PR, the PR body).
-   - The diff **is** a requirement — the spec asks for this change, and the pixels show it and nothing
-     else → **update the baseline** from the Docker run, and nothing else in that commit. The commit
-     message **cites the requirement** by number and phrase, e.g. `Update Holders baseline for FR3
-     (balance column shows USD value)`. A baseline from a plain local run is never committed.
-   - Anything else — a diff the spec does not ask for, a diff larger than the requirement, a change you
-     can explain only as "it moved", a baseline for presentation the spec does not name → **`needs-human`**.
-     The question names the test, the image paths and what the spec does and does not say.
+A gate only one child has gets its procedure from that child: its
+`.agents/skills/review-loop/ci-fixes-local.md`, the local part of this file. Look for it once, before fixing. When a failing job is of a gate it names, follow its
+procedure for that job. The escape above binds it. A child with no such file adds nothing, and every
+failure is a plain fix under the escape.
 
 ## 4. Commit
 

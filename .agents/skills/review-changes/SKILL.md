@@ -64,19 +64,17 @@ processes (a reviewer CLI, subagents) and every one of them has to land in the s
   directory.** Run at the home root, the same command reads home's branch, home's tree and home's pull
   request.
 - **A path written from the root is from the child's root**: the task folder, the spec, the review file,
-  `.agents/delegation.md`, `.agents/rules/`, a finding's `path:line`. A relative link, such as
-  [`axes.md`](axes.md), is a home file beside this one.
+  `.agents/rules/`, a finding's `path:line`. A relative link, such as [`axes.md`](axes.md), is a home file
+  beside this one.
 - **Every subagent is given the child's name and absolute path** with its brief, so it does not work out
   the repository for itself.
 
 **`--child home` reviews home itself.** `home` is a reserved name, and `children.txt` never lists it. The
 repository is home and its directory is the session's root. Wherever the review skills and their supporting
-files say "the child", read home. Four things differ:
+files say "the child", read home. Three things differ:
 
-- **Home has no task folder, spec or `.agents/delegation.md`.** The spec axis does not run. The `md` output
-  stops, because it has no task folder to write into.
+- **Home has no local files**, so the list step 1 makes is empty.
 - **The rules are home's own**, in `.agents/rules/`. Read them once.
-- **The repo checks are the `lint:*` and `test*` scripts in home's `package.json`.**
 - **A child cloned inside home is another repository.** It is gitignored. Leave its files out of the
   review and out of the fixes.
 
@@ -125,32 +123,32 @@ Collect, in the review's own context:
 - `git diff --stat <base>` and `git diff --name-only <base>`, plus untracked files
   (`git ls-files --others --exclude-standard`) — a new file is the most review-worthy thing in a change and
   `git diff` alone misses it. Under `--scope uncommitted` the new files are usually most of the change.
-- The task's `spec.md` (if this is a task PR) and the child's `.agents/delegation.md`.
+- The local files, which hold what the child adds to the files of this skill: list
+  `.agents/skills/review-changes/*-local.md` in the child, and read `SKILL-local.md` when it is there. A
+  child with none, or with a section missing, is reviewed without it: no check is run and no document of
+  the child is read. Only the `md` output stops, because it needs `## Task documents`.
+- The documents under `## Documents` of `SKILL-local.md`, and the task's spec, found as its
+  `## Task documents` says (if this is a task PR).
 
 Where the table says to run the checks, run them yourself rather than taking "checks pass" on trust —
-verifying that claim is most of what a review is worth:
+verifying that claim is most of what a review is worth. The commands are under `## Checks` of
+`SKILL-local.md`.
 
-```bash
-pnpm lint:eslint --changed=<base>
-pnpm lint:tsc
-pnpm lint:cspell
-pnpm test:vitest --changed <base>
-```
-
-**Done when**: the base, the touched-file list, and (where run) the check results are in hand, and the diff
-is known non-empty.
+**Done when**: the base, the touched-file list, the list of local files, and (where run) the check results
+are in hand, and the diff is known non-empty.
 
 ## 2. Round `first` — spawn the axes
 
 Send **one** message with the `general-purpose` subagents the change actually has axes for. Each gets: the
 child's name and absolute path, the scope, the base ref, the touched-file list plus untracked files, the spec
-path when one resolved and the ticket when the run has one, the check output as established fact, and
-[`axes.md`](axes.md) — its own brief, the finding shape and the per-finding cap all live there.
+path when one resolved and the ticket when the run has one, the paths of the child's local files and of its
+`## Documents` (or that it has none), the check output as established fact, and [`axes.md`](axes.md) — its
+own brief, the finding shape and the per-finding cap all live there.
 
 **The spec axis is gated on a spec existing.** Plenty of changes have none — work done outside the task
-workflow, and any task finished inside its own grilling session (see "Not every task needs a spec" in
-the child's `.agents/tasks/README.md`). Confirm `spec.md` is there before dispatching. With no
-spec, run the **two** other axes and say so in the report.
+workflow, a task finished inside its own grilling session, and every change in a child with no
+`## Task documents`. Confirm the spec file is there before dispatching. With no spec, run the **two** other
+axes and say so in the report.
 
 **Done when**: every dispatched axis has returned, or one has failed and you have noted which.
 
@@ -212,9 +210,16 @@ indistinguishable from a review that never ran.
 
 Then close **in the terminal** with where the review was published — the review's `html_url` from the POST
 response, or the review file's path — counts per severity, counts per axis (an axis that came back empty is
-worth a second look), and the outcome.
+worth a second look), the outcome, and one **local part** line. The line is in the terminal only, never in
+the published review. It names the local files that were read, or says the child has none, and lists what
+was left out for want of one:
 
-**Done when**: the review is published and the counts reported.
+```
+Local part: SKILL-local.md, smells-local.md
+Local part: none. Spec axis skipped, no child documents read.
+```
+
+**Done when**: the review is published, and the counts and the local part line reported.
 
 ## Out of bounds
 
@@ -224,7 +229,7 @@ reader to skim past real problems.
 - **Any visual or styling judgement.** Presentation belongs to the style leaf and the developer who
   verifies it in the running app.
 - **Anything the spec's Out of scope section names.**
-- **Missing Playwright screenshot baselines** — human-generated, per the child's `.agents/delegation.md`.
+- **Whatever the child's `SKILL-local.md` lists under `## Not a finding`.**
 - **Style preferences with no basis** in `.agents/rules/`, a `CONTEXT.md`, or the surrounding code. No
   citable rule or precedent, no finding.
 - **Any "add a comment here" suggestion.** `code-quality.md` bans comments outright; its one exception — a

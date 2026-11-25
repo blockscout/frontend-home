@@ -2,9 +2,13 @@
 
 One brief per axis, dispatched by [`SKILL.md`](SKILL.md) step 2. You are one axis: read **your** section
 and ignore the others. The orchestrator has already given you the child, the scope, the base ref, the
-touched files (untracked included), and the check results — those are established fact, so do not re-run
-them. The change is in the child: run `git` in its directory and read every root-relative path below from
-its root.
+touched files (untracked included), the child's local files and documents, and the check results — those
+are established fact, so do not re-run them. The change is in the child: run `git` in its directory and
+read every root-relative path below from its root.
+
+A **local file** is what the child adds to one file of this skill: `<file>-local.md` in the child's
+`.agents/skills/review-changes/`. Whenever you read a file of this skill, read its local file too when
+the orchestrator's list has it. With none listed, the child adds nothing.
 
 ## What every axis returns
 
@@ -33,8 +37,8 @@ not a finding.
 ## Standards axis
 
 Read the rules matching the touched file types, the child's `.agents/rules/*.md` and home's in
-[`../../rules/`](../../rules/), every `CONTEXT.md` for directories the diff touches, the child's
-`.agents/delegation.md`, and **one** smell baseline, picked by what the diff touches:
+[`../../rules/`](../../rules/), every `CONTEXT.md` for directories the diff touches, the child's documents
+the orchestrator gave you, and **one** smell baseline with its local file, picked by what the diff touches:
 
 | The diff touches | Baseline |
 | --- | --- |
@@ -61,5 +65,6 @@ section of home's [`../../rules/tests-unit.md`](../../rules/tests-unit.md)).
 
 ## Out of bounds
 
-The **Out of bounds** list in [`SKILL.md`](SKILL.md) binds every axis. Read it before you report: a finding
-it names is dropped whichever axis raised it.
+The **Out of bounds** list in [`SKILL.md`](SKILL.md) binds every axis, and so does `## Not a finding` in
+the child's `SKILL-local.md`. Read both before you report: a finding either names is dropped whichever axis
+raised it.
