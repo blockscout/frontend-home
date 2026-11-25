@@ -4,7 +4,8 @@ One brief per axis, dispatched by [`SKILL.md`](SKILL.md) step 2. You are one axi
 and ignore the others. The orchestrator has already given you the child, the scope, the base ref, the
 touched files (untracked included), the child's local files and documents, and the check results — those
 are established fact, so do not re-run them. The change is in the child: run `git` in its directory and
-read every root-relative path below from its root.
+read every root-relative path below from its root. Any other child present in home is another repository:
+leave its files out of the review, and do not cite them as precedent.
 
 A **local file** is what the child adds to one file of this skill: `<file>-local.md` in the child's
 `.agents/skills/review-changes/`. Whenever you read a file of this skill, read its local file too when

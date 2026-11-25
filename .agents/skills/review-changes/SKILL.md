@@ -68,6 +68,8 @@ processes (a reviewer CLI, subagents) and every one of them has to land in the s
   beside this one.
 - **Every subagent is given the child's name and absolute path** with its brief, so it does not work out
   the repository for itself.
+- **Any other child present is another repository.** Leave its files out of the review and out of the
+  fixes, and do not cite them as precedent.
 
 **`--child home` reviews home itself.** `home` is a reserved name, and `children.txt` never lists it. The
 repository is home and its directory is the session's root. Wherever the review skills and their supporting
@@ -75,8 +77,7 @@ files say "the child", read home. Three things differ:
 
 - **Home has no local files**, so the list step 1 makes is empty.
 - **The rules are home's own**, in `.agents/rules/`. Read them once.
-- **A child cloned inside home is another repository.** It is gitignored. Leave its files out of the
-  review and out of the fixes.
+- **Every child cloned inside home is such another repository.** It is gitignored.
 
 ### `--as` and concurrent reviewers
 
@@ -123,10 +124,14 @@ Collect, in the review's own context:
 - `git diff --stat <base>` and `git diff --name-only <base>`, plus untracked files
   (`git ls-files --others --exclude-standard`) — a new file is the most review-worthy thing in a change and
   `git diff` alone misses it. Under `--scope uncommitted` the new files are usually most of the change.
-- The local files, which hold what the child adds to the files of this skill: list
-  `.agents/skills/review-changes/*-local.md` in the child, and read `SKILL-local.md` when it is there. A
-  child with none, or with a section missing, is reviewed without it: no check is run and no document of
-  the child is read. Only the `md` output stops, because it needs `## Task documents`.
+- The local files, which hold what the child adds to the files of this skill. List them with the command
+  below and read `SKILL-local.md` when it is listed. No output, or only a warning that the directory is missing, means the child has none. A child with
+  none, or with a section missing, is reviewed without it: no check is run and no document of the child
+  is read. Only the `md` output stops, because it needs `## Task documents`.
+
+  ```bash
+  git ls-files --cached --others --exclude-standard -- '.agents/skills/review-changes/*-local.md'
+  ```
 - The documents under `## Documents` of `SKILL-local.md`, and the task's spec, found as its
   `## Task documents` says (if this is a task PR).
 
