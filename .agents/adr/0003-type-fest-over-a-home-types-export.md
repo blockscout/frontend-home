@@ -25,4 +25,4 @@ for the published declarations above, and because every signature would be a con
   `NonEmptyArray` was mutable. A type the package lacks, such as `Pairs`, is defined where it is used.
 - **The package sets a TypeScript floor.** `type-fest` 6 requires TypeScript 6. A child on an older
   compiler takes an older major, and a published package that lists `type-fest` as a dependency passes the
-  floor on to its consumers. The UI toolkit of `frontend` does not import it for that reason.
+  floor on to its consumers. The UI toolkit of `frontend` does, and requires TypeScript 6 of them.
