@@ -125,19 +125,22 @@ Collect, in the review's own context:
   (`git ls-files --others --exclude-standard`) — a new file is the most review-worthy thing in a change and
   `git diff` alone misses it. Under `--scope uncommitted` the new files are usually most of the change.
 - The local files, which hold what the child adds to the files of this skill. List them with the command
-  below and read `SKILL-local.md` when it is listed. No output, or only a warning that the directory is missing, means the child has none. A child with
-  none, or with a section missing, is reviewed without it: no check is run and no document of the child
-  is read. Only the `md` output stops, because it needs `## Task documents`.
+  below and read `SKILL-local.md` when it is listed. No output, or only a warning that the directory is
+  missing, means the child has none. A child without `SKILL-local.md` has none of its sections. A missing
+  section skips only the step that needs it: with no `## Documents` no document of the child is read, with
+  no `## Checks` no check is run, with no `## Task documents` no spec is looked for. Only the `md` output
+  stops, and only for want of `## Task documents`.
 
   ```bash
   git ls-files --cached --others --exclude-standard -- '.agents/skills/review-changes/*-local.md'
   ```
-- The documents under `## Documents` of `SKILL-local.md`, and the task's spec, found as its
-  `## Task documents` says (if this is a task PR).
+- The documents under `## Documents` of `SKILL-local.md`, when it has that section.
+- The task's spec, found as `## Task documents` of `SKILL-local.md` says, when it has that section and this
+  is a task PR.
 
 Where the table says to run the checks, run them yourself rather than taking "checks pass" on trust —
 verifying that claim is most of what a review is worth. The commands are under `## Checks` of
-`SKILL-local.md`.
+`SKILL-local.md`, when it has that section.
 
 **Done when**: the base, the touched-file list, the list of local files, and (where run) the check results
 are in hand, and the diff is known non-empty.
@@ -163,13 +166,16 @@ Re-reviewing everything keeps surfacing unrelated findings, so the round never c
 on what is already open and nothing else.
 
 Spawn **one** fresh `general-purpose` agent — fresh, so it rules on the evidence rather than defending a
-claim it made itself. Give it the child's name and absolute path, your own tag's open findings with their
-full reply history, and the current code. It does exactly three things:
+claim it made itself. Give it the child's name and absolute path, the paths of the child's local files and
+of its `## Documents` (or that it has none), your own tag's open findings with their full reply history,
+and the current code. It does exactly three things:
 
 1. Verify each claimed fix actually addresses its finding, rather than cosmetically silencing it.
 2. Rule on each `reject`: **agree** — the finding closes, in the words its output file's ruling table
    gives — or **disagree**, with a counter-argument.
-3. Flag regressions introduced **by the fixes only**. New findings elsewhere are out of scope for this round.
+3. Flag regressions introduced **by the fixes only**. New findings elsewhere are out of scope for this
+   round. [Out of bounds](#out-of-bounds) binds a regression as it binds a finding: one that the list
+   names is dropped.
 
 Under `--scope uncommitted` the fixes are not separable from the original work in the diff, so verify each
 one against the code as it now stands rather than looking for what changed since round 1.
@@ -217,7 +223,7 @@ Then close **in the terminal** with where the review was published — the revie
 response, or the review file's path — counts per severity, counts per axis (an axis that came back empty is
 worth a second look), the outcome, and one **local part** line. The line is in the terminal only, never in
 the published review. It names the local files that were read, or says the child has none, and lists what
-was left out for want of one:
+was left out for want of a file or of a section:
 
 ```
 Local part: SKILL-local.md, smells-local.md
@@ -234,7 +240,8 @@ reader to skim past real problems.
 - **Any visual or styling judgement.** Presentation belongs to the style leaf and the developer who
   verifies it in the running app.
 - **Anything the spec's Out of scope section names.**
-- **Whatever the child's `SKILL-local.md` lists under `## Not a finding`.**
+- **Whatever the child's `SKILL-local.md` lists under `## Not a finding`**, when the child has that file
+  and that section. Without either, the child adds no entry.
 - **Style preferences with no basis** in `.agents/rules/`, a `CONTEXT.md`, or the surrounding code. No
   citable rule or precedent, no finding.
 - **Any "add a comment here" suggestion.** `code-quality.md` bans comments outright; its one exception — a

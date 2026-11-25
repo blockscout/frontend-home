@@ -67,5 +67,6 @@ section of home's [`../../rules/tests-unit.md`](../../rules/tests-unit.md)).
 ## Out of bounds
 
 The **Out of bounds** list in [`SKILL.md`](SKILL.md) binds every axis, and so does `## Not a finding` in
-the child's `SKILL-local.md`. Read both before you report: a finding either names is dropped whichever axis
-raised it.
+the child's `SKILL-local.md` when the orchestrator's list has that file. Read the list before you report,
+and that section when the file is listed: a finding either names is dropped whichever axis raised it. With
+no `SKILL-local.md` listed there is nothing more to read, and the child adds no entry.
