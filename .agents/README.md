@@ -68,6 +68,39 @@ session started inside the child loads the local rule and the child's frozen rul
 - **A frozen rule cannot carry local content.** The exclusion hides the whole file from a home session, so
   what is local sits in the local rule, never in the frozen copy.
 
+## Local parts of a skill in a child
+
+A **local part** holds what one child adds to a file of a home skill: its commands, its documents, the
+procedures of its own gates. For the file `<file>.md` of home skill `<name>` it is the child's
+`.agents/skills/<name>/<file>-local.md`. A child has one only for a file it adds something to.
+
+Nothing loads a local part. A local rule loads when a matching file is read; a local part is read only
+because the home file sends the reader to it.
+
+- **The home file names its local part where it is read**, with "when the child has one", and says what
+  happens without it.
+- **A local part adds and never replaces.** It has no "the child wins" clause. Three shapes:
+
+  | Shape | The home file | The local part |
+  |---|---|---|
+  | A hole | one sentence that names a section of the local part | the values under that heading |
+  | A list entry | its list, then a pointer to the child's entries | more entries, under the home item's name when they extend one |
+  | A whole procedure | a pointer saying the child may add procedures of its own | the procedure |
+
+  A child that needs a home step done differently is a reason to put a hole in the home file first.
+- **A fact two files of one skill need is in `SKILL-local.md` only.** The other home file points there or
+  gets the fact in its brief.
+- **A skill that starts subagents lists the child's local parts once** and passes the list in every brief,
+  with the path of each document the local part names. A subagent then cannot take a file it did not look
+  for as a file that is not there.
+- **A child with no local part never stops a run.** The step that needs one is skipped and the closing
+  report names it. The home file states the exception when a mode cannot run without a section.
+- **Home has no local part.** It would sit beside the home files it adds to. A skill that takes home as
+  the repository under review treats it as a child with none.
+- **A local part is the child's own.** Edit it in the child.
+- **A frozen skill in the child is not kept in step with the local part.** A session started inside the
+  child reads the frozen copy and never the local part.
+
 ## Child skills
 
 A session started in home has a child's skills only through the committed symlinks in `skills/`. Each is named

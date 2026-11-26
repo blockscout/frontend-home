@@ -3,7 +3,8 @@
 Nine smells for the instruction surface — `.agents/`, `AGENTS.md`, every `CONTEXT.md`, `.cursor/`,
 `.github/*instructions*`. The Standards axis carries **this** baseline instead of
 [`smells.md`](smells.md) when the diff touches those files, because a markdown diff has no God Components
-and thirteen React/TS smells on it are pure noise.
+and thirteen React/TS smells on it are pure noise. What the child adds to this baseline is in its
+`.agents/skills/review-changes/prose-smells-local.md`, when it has one.
 
 An instruction file is not documentation — it is **code that runs on an agent**. A rule nobody can execute
 deterministically is as broken as a function that returns the wrong value, so review it that way.
@@ -59,17 +60,14 @@ Resolve it by matching **invalidation triggers** — what would make someone edi
 
 | File | Edited when | Answers |
 | --- | --- | --- |
-| `.agents/delegation.md` | agent capability or trust changes | *may an agent do this?* |
-| `.agents/tasks/README.md` | the product-task workflow changes | *how does a task reach a merged PR?* |
 | `.agents/AGENTS.md` | the repo gains something worth knowing about | *what exists, where do I read it?* |
 | `.agents/rules/*.md` | a coding convention changes | *how do I write the code?* |
 | a skill's `SKILL.md` | that workflow's steps change | *what do I do, in what order?* |
 
-Two consequences worth flagging as findings:
+The child's local file adds the rows for its own documents, and its own consequences.
+
+A consequence worth flagging as a finding:
 
 - **`AGENTS.md` carries pointers, never mechanics.** It is always-loaded, so every session pays for it —
   including the majority that never touch the thing being explained. A *how* there is misfiled by
   construction.
-- **A statement naming a spec artefact** — ticket, leaf, tag, checkbox, breakdown — belongs to the
-  workflow layer, not to `delegation.md`, which must read correctly in a repo that never adopted the
-  workflow.

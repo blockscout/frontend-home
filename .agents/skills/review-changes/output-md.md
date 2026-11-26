@@ -6,9 +6,10 @@ threads. Only agents read it (`resolve-review` replies in the same file), so a f
 
 ## Where the file goes
 
-The task folder comes off the child's branch name, `issue-<number>` → `.agents/tasks/<issue>-<slug>/` in
-the child. If no task folder resolves, stop and ask — this mode reviews tasks and tickets, and inventing a
-path elsewhere buries the review where nothing will look for it.
+The task folder is found as `## Task documents` in the child's `SKILL-local.md` says, which step 1 of
+[`SKILL.md`](SKILL.md) read. A child with no such section has no task folder, and the run stops.
+If no task folder resolves, stop and ask — this mode reviews tasks and tickets, and inventing a path
+elsewhere buries the review where nothing will look for it.
 
 | `--scope` | The file |
 | --- | --- |
