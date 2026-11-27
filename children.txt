@@ -2,3 +2,4 @@
 # The name is the directory the child is cloned into. Read through scripts/children.sh.
 frontend git@github.com:blockscout/frontend.git
 app-sdk git@github.com:blockscout/app-sdk.git
+frontend-configs git@github.com:blockscout/frontend-configs.git

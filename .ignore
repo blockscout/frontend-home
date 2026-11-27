@@ -4,3 +4,4 @@
 # Children, as listed in children.txt (pnpm lint:children)
 !/frontend/
 !/app-sdk/
+!/frontend-configs/

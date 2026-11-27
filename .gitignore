@@ -5,6 +5,7 @@ dist
 # Children, as listed in children.txt (pnpm lint:children)
 /frontend/
 /app-sdk/
+/frontend-configs/
 
 # Task worktrees (.claude/hooks/worktree-create.sh) and per-developer Claude Code settings
 /.claude/worktrees/

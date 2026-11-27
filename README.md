@@ -5,7 +5,7 @@ Agent sessions start here. The project repositories, the **children**, are clone
 gitignored.
 
 **Status: phase 1.** See [blockscout/frontend#3882](https://github.com/blockscout/frontend/issues/3882).
-The children are `frontend` and `app-sdk`, and the layout may still change.
+The children are `frontend`, `app-sdk` and `frontend-configs`, and the layout may still change.
 
 | Path | What it is |
 |---|---|
