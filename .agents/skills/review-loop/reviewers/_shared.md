@@ -17,18 +17,14 @@ default and 10 in a `-p` run. A limit at or under the watchdog's ends the script
 and a real timeout then reads as a transport failure. In another harness, give the background command a
 limit above 30 minutes by whatever means it has.
 
+The script is home's `.agents/skills/review-loop/reviewers/run-reviewer.sh`. Run it from the home worktree
+root, as one plain command:
+
 ```bash
-rm -f <scratchpad>/review-<round>.{json,err,exit,timeout}
-<invocation> \
-  > <scratchpad>/review-<round>.json 2> <scratchpad>/review-<round>.err &
-pid=$!
-( sleep 1800 && kill "$pid" 2>/dev/null && echo 124 > <scratchpad>/review-<round>.timeout ) &
-watchdog=$!
-wait "$pid"; rc=$?
-kill "$watchdog" 2>/dev/null
-[ -f <scratchpad>/review-<round>.timeout ] && rc=124
-echo "$rc" > <scratchpad>/review-<round>.exit
+bash .agents/skills/review-loop/reviewers/run-reviewer.sh <round> <scratchpad> <invocation>
 ```
+
+It leaves `review-<round>.json` (stdout), `.err`, `.exit` and, on a timeout, `.timeout` in the scratchpad.
 
 `<invocation>` is the command from the reviewer file's Invocation section, filled in per the rules under it
 and these two, which hold for every provider:
@@ -37,7 +33,7 @@ and these two, which hold for every provider:
 - `--round follow-up` on every round after the first; the first round passes no `--round`. This script is
   what runs, so a round-2 run without it is a second `first` round.
 
-The script's first line clears what an earlier run left under the same names: a retry of the same round, or
+The script first clears what an earlier run left under the same names: a retry of the same round, or
 another loop in the same session, would otherwise find a stale exit file and read it as its own.
 
 Record the start time first (`date -u +%FT%TZ`); [Deciding the run](#deciding-the-run) compares against it.

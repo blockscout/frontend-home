@@ -101,7 +101,8 @@ Two further rules on verdicts, each with its auto-mode form:
 - **Nits are `deferred`**, not fixed. The developer may promote one at Gate 1. **In auto mode** a nit is
   fixed when its fix stays within 5 lines in one file, adds no test and creates no file, and always when the
   nit concerns comments, docs or tests; any other nit is `deferred` and stays an open thread for the
-  developer.
+  developer. A nit the caller's brief names as **promoted** by the developer is `fix` at any size. When
+  your own check shows a promoted nit's claim is wrong, mark it `needs-human`.
 
 ## 1. Scope
 
