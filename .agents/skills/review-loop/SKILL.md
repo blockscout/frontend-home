@@ -91,7 +91,7 @@ Rounds are numbered from 1. Each round:
    locally ends the loop at step 5. Green with the resolver's fixes still local is **not** the end: the
    round pushes them — its one push — and waits for the run on the new `headRefOid`; that run's conclusion
    is the one that ends the loop or opens a CI-fix cycle. Red enters the post-clear CI-fix cycles step 4
-   describes. Neither path runs another review round.
+   describes. Neither path runs another review round. The one exception is [a promoted nit](#a-promoted-nit).
 
 **One push per round.** The review fixes and the CI fix are separate commits — the history shows which
 change came from which source — and they leave in one `git push` after the CI wait. Nothing is pushed
@@ -194,5 +194,26 @@ exhausted, post-clear CI-fix cycles exhausted, or the reviewer's stop, in the wo
 [`reviewers/_shared.md`](reviewers/_shared.md#deciding-the-run) table), the number of rounds run and of
 post-clear CI-fix cycles, the Checks run url for the final `HEAD` and its conclusion, the
 counts from the last resolver report, whatever the reviewer file says to carry into the report, and anything
-left open — `deferred` nits and `answered` human threads stay as open threads for the developer. Leave the
+left open — `deferred` nits and `answered` human threads stay as open threads for the developer. List each
+`deferred` nit on its own line, with its id and its claim, so the developer can promote one by id. Leave the
 PR's threads as the reviewer and the resolver left them.
+
+## A promoted nit
+
+The developer **promotes** a nit by asking for a `deferred` nit to be fixed, during the loop or after its
+report. A resolver makes the fix. The orchestrator edits nothing, here as everywhere in the loop.
+
+1. **Queue the promotion** while a reviewer run or a CI wait is in flight. Act when that wait ends.
+2. **Dispatch a fresh resolver** as in step 3. Add to its brief the ids of the promoted nits and that the
+   developer promoted them. A `needs-human` return pauses the loop as step 3 says.
+3. **Wait for CI and push once**, as in step 4.
+4. **Run a review round** with `--round follow-up`, so the reviewer rules on its threads.
+
+If the promotion arrives before the round's own resolver is dispatched, it rides in that resolver's brief
+and the round goes on as usual.
+
+**The promotion round is not counted** against the three-round bound. Read its outcome as any round's: a
+`blocked` outcome continues the loop under the count as it stood. With the three rounds already spent, a
+`blocked` outcome is resolved once, the way a third round is, and the loop ends with its report.
+
+**Done when**: the follow-up review is read from the PR and the loop has ended as step 5 says.
